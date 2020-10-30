@@ -401,6 +401,7 @@ module('Integration | Component | line chart', function(hooks) {
       })
     ]);
 
+    debugger;
     this.set('model', anomalousDataModel);
     this.set('options', {
       axis: {

@@ -1,0 +1,12 @@
+{
+  dbconfigs:
+  [
+    {
+      name: Starwars_H2_Data_Source
+      url: jdbc:h2:mem:db2;DB_CLOSE_DELAY=-1
+      driver: org.h2.Driver
+      user: luke
+      dialect: com.yahoo.elide.datastores.aggregation.queryengines.sql.dialects.impl.H2Dialect
+    }
+  ]
+}

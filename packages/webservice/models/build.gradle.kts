@@ -28,8 +28,15 @@ allOpen {
     annotation("javax.persistence.MappedSuperclass")
 }
 
+repositories {
+    mavenCentral()
+    flatDir{
+        dirs("lib")
+    }
+}
+
 dependencies {
-    implementation("com.yahoo.elide", "elide-core", "5.0.0-pr21")
+    implementation( "com.yahoo.elide", "elide-core", "5.0.0-pr24-SNAPSHOT")
     implementation("javax.persistence", "javax.persistence-api", "2.2")
     implementation("org.hibernate", "hibernate-core", "5.4.15.Final")
 }

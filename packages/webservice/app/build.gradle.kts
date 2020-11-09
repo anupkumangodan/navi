@@ -12,16 +12,19 @@ plugins {
     id("com.moowork.node") version "1.3.1"
     kotlin("jvm")
     kotlin("plugin.spring") version "1.3.72"
+    id("org.liquibase.gradle") version "2.0.4"
+
 }
 
 repositories {
     mavenCentral()
+    flatDir { dirs("lib") }
 }
 
 dependencies {
     implementation(project(":models"))
     implementation("org.springframework.boot:spring-boot-starter-security")
-    implementation("com.yahoo.elide", "elide-spring-boot-starter", "5.0.0-pr23")
+    implementation("com.yahoo.elide", "elide-spring-boot-starter", "5.0.0-pr24-SNAPSHOT")
     implementation("org.jetbrains.kotlin:kotlin-reflect")
     implementation("com.h2database", "h2", "1.3.176")
     implementation( "org.hibernate", "hibernate-validator", "6.1.5.Final")

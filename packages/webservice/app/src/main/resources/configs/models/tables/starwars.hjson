@@ -1,0 +1,79 @@
+{
+  tables:
+  [
+    {
+      name: MissionLog
+      schema: db1
+      table: mission_log
+      dbConnectionName: Starwars_H2_Data_Source
+      description: Mission information
+      cardinality: tiny
+      joins: [
+        {
+          name: Pilot
+          to: Pilot
+          type: toOne
+          definition: 'LOWER({{Pilot.id}}) = LOWER({{pilot_id}})'
+        },
+        {
+          name: Pilot_wins
+          to: Pilot
+          type: toOne
+          definition: 'LOWER({{Pilot.id}}) = LOWER({{pilot_id}}) '
+        },
+
+        {
+          name: Craft
+          to: Craft
+          type: toOne
+          definition: 'LOWER({{Craft.id}}) = LOWER({{craft_id}})'
+        }
+      ],
+
+      dimensions:
+      [
+        {
+          name: Craft_name
+          type: TEXT
+          definition: '{{Craft.name}}'
+          tableSource: Craft.name
+        }
+        {
+          name: Pilot_name
+          type: TEXT
+          definition: '{{Pilot.name}}'
+          tableSource: Pilot.name
+        }
+
+      ]
+      measures:
+      [
+        {
+          name: missions
+          type: DECIMAL
+          definition: count(id)
+          category: Missions
+        }
+        {
+          name: days_of_service
+          type: DECIMAL,
+          definition: sum(days_of_service),
+          category: Days_Of_Service
+        }
+        {
+          name: battles_won
+          type: DECIMAL,
+          definition: ??,
+          category: Battles_won
+        }
+        {
+          name: battles_lost,
+          type: DECIMAL,
+          definition: ??,
+          category: Battles_won
+        }
+
+      ]
+    }
+  ]
+}

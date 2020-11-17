@@ -1,1 +1,1 @@
-cd packages/webservice && ./gradlew bootRun
+web: cd packages/webservice && ./gradlew bootRun

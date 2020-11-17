@@ -1,0 +1,7 @@
+{
+  "name": "Yavin Demo app",
+  "description": "A simple demo app using Yavin",
+  "repository": " https://github.com/anupkumangodan/navi.git",
+  "logo": "https://node-js-sample.herokuapp.com/node.png",
+  "keywords": ["yavin", "navi", "elide"]
+}

@@ -48,7 +48,7 @@ tasks.withType<Test> {
 }
 
 tasks.withType<ProcessResources> {
-    dependsOn("copyNaviApp")
+    dependsOn("copyNaviApp_alt")
 }
 
 tasks.withType<KotlinCompile> {
@@ -77,6 +77,11 @@ tasks.register<Copy>("copyNaviApp") {
     into("$buildDir/resources/main/META-INF/resources/ui")
 }
 
+tasks.register<Copy>("copyNaviApp_alt") {
+    dependsOn("installUIDependencies")
+    from("../../app/dist")
+    into("$buildDir/resources/main/META-INF/resources/ui")
+}
 tasks.withType<ShadowJar> {
     classifier = ""
 

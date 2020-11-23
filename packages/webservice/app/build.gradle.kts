@@ -1,5 +1,5 @@
-import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
-import com.github.jengelman.gradle.plugins.shadow.transformers.PropertiesFileTransformer
+//import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
+//import com.github.jengelman.gradle.plugins.shadow.transformers.PropertiesFileTransformer
 import com.moowork.gradle.node.npm.NpmTask
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
@@ -8,7 +8,7 @@ description = "app"
 plugins {
     id("org.springframework.boot") version "2.3.1.RELEASE"
     id("io.spring.dependency-management") version "1.0.9.RELEASE"
-    id("com.github.johnrengelman.shadow") version "5.2.0"
+  //  id("com.github.johnrengelman.shadow") version "5.2.0"
     kotlin("jvm")
     kotlin("plugin.spring") version "1.3.72"
     id("com.github.node-gradle.node") version "2.2.4"
@@ -22,17 +22,18 @@ node {
 
 repositories {
     mavenCentral()
+    mavenLocal()
 }
 
 dependencies {
     implementation(project(":models"))
     implementation("org.springframework.boot:spring-boot-starter-security")
-    implementation("com.yahoo.elide", "elide-spring-boot-starter", "5.0.0-pr24")
+    implementation("com.yahoo.elide", "elide-spring-boot-starter", "5.0.0-pr26")
     implementation("org.jetbrains.kotlin:kotlin-reflect")
     implementation("com.h2database", "h2", "1.3.176")
     implementation( "org.hibernate", "hibernate-validator", "6.1.5.Final")
     implementation("io.micrometer","micrometer-core", "1.5.1")
-    implementation("org.projectlombok", "lombok", "1.18.10")
+    //implementation("org.projectlombok", "lombok", "1.18.10")
     implementation("org.liquibase", "liquibase-core", "3.8.1")
     testImplementation("org.springframework.boot:spring-boot-starter-test") {
         exclude(group = "org.junit.vintage", module = "junit-vintage-engine")
@@ -82,7 +83,7 @@ tasks.register<Copy>("copyNaviApp_alt") {
     from("../../app/dist")
     into("$buildDir/resources/main/META-INF/resources/ui")
 }
-tasks.withType<ShadowJar> {
+/*tasks.withType<ShadowJar> {
     classifier = ""
 
     // Required for Spring
@@ -98,7 +99,9 @@ tasks.withType<ShadowJar> {
     }
 }
 
+
 tasks.register<Exec>("execJar") {
     dependsOn("shadowJar")
     commandLine = listOf("java", "-jar", "build/libs/app-${project.version}.jar")
 }
+*/

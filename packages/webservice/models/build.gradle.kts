@@ -13,6 +13,7 @@ plugins {
     id("com.jfrog.artifactory") version "4.16.1"
     kotlin("plugin.allopen") version "1.3.72"
     kotlin("plugin.jpa") version "1.3.72"
+    id("org.springframework.boot") version "2.3.1.RELEASE"
 }
 
 java {
@@ -29,7 +30,7 @@ allOpen {
 }
 
 dependencies {
-    implementation("com.yahoo.elide", "elide-core", "5.0.0-pr24")
+    implementation("com.yahoo.elide", "elide-core", "5.0.0-pr26")
     implementation("javax.persistence", "javax.persistence-api", "2.2")
     implementation("org.hibernate", "hibernate-core", "5.4.15.Final")
 }

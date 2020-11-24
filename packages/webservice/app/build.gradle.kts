@@ -1,5 +1,5 @@
-import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
-import com.github.jengelman.gradle.plugins.shadow.transformers.PropertiesFileTransformer
+//import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
+//import com.github.jengelman.gradle.plugins.shadow.transformers.PropertiesFileTransformer
 import com.moowork.gradle.node.npm.NpmTask
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
@@ -8,7 +8,7 @@ description = "app"
 plugins {
     id("org.springframework.boot") version "2.3.1.RELEASE"
     id("io.spring.dependency-management") version "1.0.9.RELEASE"
-    id("com.github.johnrengelman.shadow") version "5.2.0"
+   // id("com.github.johnrengelman.shadow") version "5.2.0"
     kotlin("jvm")
     kotlin("plugin.spring") version "1.3.72"
     id("com.github.node-gradle.node") version "2.2.4"
@@ -77,6 +77,7 @@ tasks.register<Copy>("copyNaviApp") {
     into("$buildDir/resources/main/META-INF/resources/ui")
 }
 
+/*
 tasks.withType<ShadowJar> {
     classifier = ""
 
@@ -91,9 +92,9 @@ tasks.withType<ShadowJar> {
     manifest {
         attributes["Main-Class"] = "com.yahoo.navi.ws.AppKt"
     }
-}
+}*/
 
 tasks.register<Exec>("execJar") {
-    dependsOn("shadowJar")
+    dependsOn("bootJar")
     commandLine = listOf("java", "-jar", "build/libs/app-${project.version}.jar")
 }

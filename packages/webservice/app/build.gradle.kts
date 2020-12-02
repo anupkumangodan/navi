@@ -1,5 +1,3 @@
-//import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
-//import com.github.jengelman.gradle.plugins.shadow.transformers.PropertiesFileTransformer
 import com.moowork.gradle.node.npm.NpmTask
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
@@ -8,7 +6,6 @@ description = "app"
 plugins {
     id("org.springframework.boot") version "2.3.1.RELEASE"
     id("io.spring.dependency-management") version "1.0.9.RELEASE"
-   // id("com.github.johnrengelman.shadow") version "5.2.0"
     kotlin("jvm")
     kotlin("plugin.spring") version "1.3.72"
     id("com.github.node-gradle.node") version "2.2.4"
@@ -58,15 +55,25 @@ tasks.withType<KotlinCompile> {
     }
 }
 
+tasks.register<NpmTask>("installEmber") {
+    setArgs(listOf("install"))
+}
+
+tasks.register<NpmTask>("installUIDependencies_") {
+    setArgs(listOf("ci","-verbose"))
+}
 tasks.register<NpmTask>("installUIDependencies") {
-    setArgs(listOf("ci"))
+    //dependsOn("installEmber")
+    setArgs(listOf("ci","-verbose"))
     setExecOverrides(closureOf<ExecSpec> {
         setWorkingDir("../../../")
+        //setWorkingDir("/usr/src/yavin/")
     })
 }
 
 tasks.register<NpmTask>("buildUI") {
   dependsOn("installUIDependencies")
+  //dependsOn("installUIDependencies_")
   setEnvironment(mapOf("DISABLE_MOCKS" to true))
   setArgs(listOf("run-script", "build-ui"))
 }
@@ -77,22 +84,6 @@ tasks.register<Copy>("copyNaviApp") {
     into("$buildDir/resources/main/META-INF/resources/ui")
 }
 
-/*
-tasks.withType<ShadowJar> {
-    classifier = ""
-
-    // Required for Spring
-    mergeServiceFiles()
-    append("META-INF/spring.handlers")
-    append("META-INF/spring.schemas")
-    transform(PropertiesFileTransformer().apply {
-        paths = listOf("META-INF/spring.factories")
-        mergeStrategy = "append"
-    })
-    manifest {
-        attributes["Main-Class"] = "com.yahoo.navi.ws.AppKt"
-    }
-}*/
 
 tasks.register<Exec>("execJar") {
     dependsOn("bootJar")

@@ -13,7 +13,7 @@
   },
   "main": "index.js",
   "scripts": {
-    "build": "ember build",
+    "build": "./node_modules/.bin/ember build",
     "prodbuild": "ember build --environment=production",
     "lint:hbs": "ember-template-lint .",
     "lint:js": "eslint .",

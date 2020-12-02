@@ -56,14 +56,17 @@ tasks.withType<KotlinCompile> {
 }
 
 tasks.register<NpmTask>("installEmber") {
-    setArgs(listOf("install"))
+    setArgs(listOf("install","-g","ember-cli"))
 }
 
+tasks.register<NpmTask>("cleanLerna") {
+    setArgs(listOf("run","clean_lerna"))
+}
 tasks.register<NpmTask>("installUIDependencies_") {
     setArgs(listOf("ci","-verbose"))
 }
 tasks.register<NpmTask>("installUIDependencies") {
-    //dependsOn("installEmber")
+    //dependsOn("cleanLerna")
     setArgs(listOf("ci","-verbose"))
     setExecOverrides(closureOf<ExecSpec> {
         setWorkingDir("../../../")

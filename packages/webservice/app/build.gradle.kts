@@ -35,6 +35,8 @@ dependencies {
         exclude(group = "org.junit.vintage", module = "junit-vintage-engine")
     }
     testImplementation("com.jayway.restassured", "rest-assured", "2.9.0")
+    implementation("org.postgresql", "postgresql", "42.2.7")
+
 }
 
 tasks.withType<Test> {
@@ -59,24 +61,15 @@ tasks.register<NpmTask>("installEmber") {
     setArgs(listOf("install","-g","ember-cli"))
 }
 
-tasks.register<NpmTask>("cleanLerna") {
-    setArgs(listOf("run","clean_lerna"))
-}
-tasks.register<NpmTask>("installUIDependencies_") {
-    setArgs(listOf("ci","-verbose"))
-}
 tasks.register<NpmTask>("installUIDependencies") {
-    //dependsOn("cleanLerna")
     setArgs(listOf("ci","-verbose"))
     setExecOverrides(closureOf<ExecSpec> {
         setWorkingDir("../../../")
-        //setWorkingDir("/usr/src/yavin/")
     })
 }
 
 tasks.register<NpmTask>("buildUI") {
   dependsOn("installUIDependencies")
-  //dependsOn("installUIDependencies_")
   setEnvironment(mapOf("DISABLE_MOCKS" to true))
   setArgs(listOf("run-script", "build-ui"))
 }
@@ -86,7 +79,6 @@ tasks.register<Copy>("copyNaviApp") {
     from("../../app/dist")
     into("$buildDir/resources/main/META-INF/resources/ui")
 }
-
 
 tasks.register<Exec>("execJar") {
     dependsOn("bootJar")

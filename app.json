@@ -1,0 +1,7 @@
+{
+  "name": "Yavin Cloud launch",
+  "description": "Yavin - built with navi & elide",
+  "reposi{tory": "https://git.heroku.com/anupkp-yavin-prc-3.git",
+  "logo": "https://node-js-sample.herokuapp.com/node.png",
+  "keywords": ["navi", "elide"]
+}

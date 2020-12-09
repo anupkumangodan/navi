@@ -1,12 +1,2 @@
-FROM openjdk:11
+FROM docker.io/verizonmedia/yavin:release_latest
 
-COPY . /usr/src/yavin
-
-WORKDIR /usr/src/yavin/packages/webservice
-RUN ./gradlew bootJar
-
-RUN rm /bin/sh && ln -s /bin/bash /bin/sh
-
-WORKDIR /usr/src/yavin
-#CMD . scripts/jdbc_url.sh && env && java -cp /usr/src/yavin/packages/webservice/app/build/libs/app-0.2.0.jar -Dloader.main=liquibase.integration.commandline.Main org.springframework.boot.loader.PropertiesLauncher --changeLogFile=/usr/src/yavin/packages/webservice/app/src/main/resources/db/changelog/changelog.xml --url='jdbc:h2:mem:db1;DB_CLOSE_DELAY=-1' --logLevel=debug update
-CMD . scripts/jdbc_url.sh && env && java -cp /usr/src/yavin/packages/webservice/app/build/libs/app-0.2.0.jar -Dloader.main=liquibase.integration.commandline.Main org.springframework.boot.loader.PropertiesLauncher --changeLogFile=/usr/src/yavin/packages/webservice/app/src/main/resources/db/changelog/changelog_postgres.xml --url=${JDBC_DATABASE_URL} --logLevel=debug update

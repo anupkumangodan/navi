@@ -7,9 +7,9 @@ package com.yahoo.navi.ws.models.hooks
 
 import com.yahoo.elide.annotation.LifeCycleHookBinding
 import com.yahoo.elide.core.exceptions.BadRequestException
-import com.yahoo.elide.functions.LifeCycleHook
-import com.yahoo.elide.security.ChangeSpec
-import com.yahoo.elide.security.RequestScope
+import com.yahoo.elide.core.lifecycle.LifeCycleHook
+import com.yahoo.elide.core.security.ChangeSpec
+import com.yahoo.elide.core.security.RequestScope
 import com.yahoo.navi.ws.models.beans.User
 import java.util.Optional
 
@@ -21,6 +21,7 @@ import java.util.Optional
 class UserValidationHook : LifeCycleHook<User> {
     override fun execute(
         operation: LifeCycleHookBinding.Operation?,
+        phase: LifeCycleHookBinding.TransactionPhase?,
         user: User?,
         requestScope: RequestScope?,
         changes: Optional<ChangeSpec>?
@@ -28,7 +29,7 @@ class UserValidationHook : LifeCycleHook<User> {
         val principalName = requestScope?.user?.name
         val userName = user?.id
 
-        if (userName != principalName) {
+        if (principalName.isNullOrEmpty() || userName != principalName) {
             throw BadRequestException("Forbidden User Identity")
         }
     }

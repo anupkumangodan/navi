@@ -1,0 +1,8 @@
+{
+  "name": "Yavin Cloud launch",
+  "description": "Yavin - built with navi & elide",
+  "repository": "https://github.com/anupkumangodan/navi/tree/heroku-cntr-1",
+  "logo": "https://node-js-sample.herokuapp.com/node.png",
+  "stack": "container",
+  "keywords": ["navi", "elide"]
+}

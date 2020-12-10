@@ -8,9 +8,9 @@ module('Unit | Serializer | Report', function(hooks) {
   setupTest(hooks);
   setupMirage(hooks);
 
-  hooks.beforeEach(function() {
+  hooks.beforeEach(async function() {
     Store = this.owner.lookup('service:store');
-    return this.owner.lookup('service:bard-metadata').loadMetadata();
+    await this.owner.lookup('service:navi-metadata').loadMetadata();
   });
 
   test('Serializing record', async function(assert) {
@@ -43,7 +43,7 @@ module('Unit | Serializer | Report', function(hooks) {
             ],
             bardVersion: 'v1',
             requestVersion: 'v1',
-            dataSource: 'dummy'
+            dataSource: 'bardOne'
           },
           visualization: {
             type: 'line-chart',
@@ -62,7 +62,8 @@ module('Unit | Serializer | Report', function(hooks) {
                       dimensions: [
                         { name: 'Property 1', values: { property: '114' } },
                         { name: 'Property 2', values: { property: '100001' } },
-                        { name: 'Property 3', values: { property: '100002' } }
+                        { name: 'Property 3', values: { property: '100002' } },
+                        { name: 'Property 4', values: { property: '100003' } }
                       ]
                     }
                   }
@@ -135,7 +136,7 @@ module('Unit | Serializer | Report', function(hooks) {
             ],
             bardVersion: 'v1',
             requestVersion: 'v1',
-            dataSource: 'dummy'
+            dataSource: 'bardOne'
           },
           visualization: {
             type: 'table',

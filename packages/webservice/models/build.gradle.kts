@@ -29,7 +29,7 @@ allOpen {
 }
 
 dependencies {
-    implementation("com.yahoo.elide", "elide-core", "5.0.0-pr15")
+    implementation("com.yahoo.elide", "elide-core", "5.0.0-pr27")
     implementation("javax.persistence", "javax.persistence-api", "2.2")
     implementation("org.hibernate", "hibernate-core", "5.4.15.Final")
 }
@@ -70,7 +70,11 @@ publishing {
 
 gradle.taskGraph.whenReady {
     if (hasTask(":models:artifactoryPublish")) {
-        version = "$version-SNAPSHOT"
+        var tag = ""
+        if(project.hasProperty("publishTag")) {
+            tag = "-${project.property("publishTag")}"
+        }
+        version = "${version}${tag}-SNAPSHOT"
         println("Overriding version as $version for artifactory")
     }
 }

@@ -1,0 +1,2 @@
+FROM docker.io/verizonmedia/yavin:web_latest
+

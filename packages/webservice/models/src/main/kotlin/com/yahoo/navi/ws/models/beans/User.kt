@@ -23,12 +23,13 @@ import javax.persistence.JoinColumn
 import javax.persistence.JoinTable
 import javax.persistence.ManyToMany
 import javax.persistence.OneToMany
+import javax.persistence.Table
 import javax.persistence.Temporal
 import javax.persistence.TemporalType
 import javax.validation.constraints.NotBlank
 
 @Entity
-@Include(rootLevel = true, type = "users")
+@Include(type = "users")
 @DeletePermission(expression = NOBODY)
 @UpdatePermission(expression = IS_SAME_USER)
 @LifeCycleHookBinding(
@@ -36,6 +37,7 @@ import javax.validation.constraints.NotBlank
     phase = LifeCycleHookBinding.TransactionPhase.PRECOMMIT,
     hook = UserValidationHook::class
 )
+@Table(name = "YavinUser")
 class User : HasRoles {
 
     @Id

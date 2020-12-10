@@ -1,0 +1,20 @@
+setup:
+  addons:
+    - plan: heroku-postgresql
+      as: DATABASE
+  config:
+    MALLOC_ARENA_MAX: 1
+build:
+  docker:
+    web: Dockerfile.web
+    release: Dockerfile.release
+  config:
+    FOO: bar
+release:
+  image: release
+run:
+  web:
+    command: cd /usr/src/yavin && . scripts/jdbc_url.sh && env && java -Xmx224m -Dspring.profiles.active=heroku_postgress -jar /usr/src/yavin/packages/webservice/app/build/libs/app-0.2.0.jar
+  release:
+    command: cd /usr/src/yavin && . scripts/jdbc_url.sh && env && java -cp /usr/src/yavin/packages/webservice/app/build/libs/app-0.2.0.jar -Dloader.main=liquibase.integration.commandline.Main org.springframework.boot.loader.PropertiesLauncher --changeLogFile=/usr/src/yavin/packages/webservice/app/src/main/resources/db/changelog/changelog_postgres.xml --url=${JDBC_DATABASE_URL} --logLevel=debug update
+

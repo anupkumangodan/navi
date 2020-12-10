@@ -1,2 +1,5 @@
-FROM docker.io/verizonmedia/yavin:release_latest
+FROM docker.io/verizonmedia/yavin:web_latest
+
+WORKDIR /usr/src/yavin
+CMD . scripts/jdbc_url.sh && env && java -cp /usr/src/yavin/packages/webservice/app/build/libs/app-0.2.0.jar -Dloader.main=liquibase.integration.commandline.Main org.springframework.boot.loader.PropertiesLauncher --changeLogFile=/usr/src/yavin/packages/webservice/app/src/main/resources/db/changelog/changelog_postgres.xml --url=${JDBC_DATABASE_URL} --logLevel=debug update
 

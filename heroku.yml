@@ -2,6 +2,8 @@ setup:
   addons:
     - plan: heroku-postgresql
       as: DATABASE
+  buildpacks:
+    - heroku/java
   config:
     MALLOC_ARENA_MAX: 1
 build:

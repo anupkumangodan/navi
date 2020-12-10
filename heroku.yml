@@ -10,6 +10,4 @@ build:
     release: Dockerfile.release
   config:
     FOO: bar1
-  buildpacks:
-    - heroku/java
 

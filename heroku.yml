@@ -9,7 +9,7 @@ build:
     web: Dockerfile.web
     release: Dockerfile.release
   config:
-    FOO: bar
+    FOO: bar1
 release:
   image: release
 run:

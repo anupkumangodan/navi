@@ -9,5 +9,5 @@ build:
     web: Dockerfile.web
     release: Dockerfile.release
   config:
-    FOO: bar2
+    FOO: bar3
 

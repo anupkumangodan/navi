@@ -1,4 +1,4 @@
 FROM docker.io/verizonmedia/yavin:web_latest
 
 WORKDIR /usr/src/yavin
-CMD scripts/heroku_web_startup.sh
+CMD . scripts/jdbc_url.sh && env && java -Xmx224m -Dspring.profiles.active=heroku_postgress -jar /usr/src/yavin/packages/webservice/app/build/libs/app-0.2.0.jar

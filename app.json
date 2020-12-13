@@ -4,5 +4,13 @@
   "repository": "https://github.com/anupkumangodan/navi.git",
   "logo": "https://node-js-sample.herokuapp.com/node.png",
   "stack": "container",
+  "addons": [
+    { 
+      "plan": "heroku-postgresql"
+    }
+  ],
+  "buildpacks": [
+    {"url": "heroku/java"}
+  ],
   "keywords": ["navi", "elide"]
 }

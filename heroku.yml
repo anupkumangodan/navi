@@ -7,7 +7,6 @@ setup:
 build:
   docker:
     web: Dockerfile.web
-    release: Dockerfile.release
   config:
     FOO: bar5
 

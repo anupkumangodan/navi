@@ -22,15 +22,15 @@
     </appender>
 
     <!-- Log Hibernate SQL Statements -->
-    <logger name="org.hibernate.SQL" level="DEBUG" />
-    <logger name="org.hibernate.type.descriptor.sql.BasicBinder" level="TRACE" />
+    <logger name="org.hibernate.SQL" level="INFO" />
+    <logger name="org.hibernate.type.descriptor.sql.BasicBinder" level="INFO" />
 
     <!-- Log JPA Datastore HQL Statements -->
-    <logger name="com.yahoo.elide.datastores.jpa.porting.EntityManagerWrapper" level="DEBUG" />
+    <logger name="com.yahoo.elide.datastores.jpa.porting.EntityManagerWrapper" level="INFO" />
 
     <!-- Log HTTP Error Explanations -->
-    <logger name="com.yahoo.elide.graphql.QueryRunner" level="DEBUG" />
-    <logger name="com.yahoo.elide.Elide" level="TRACE" />
+    <logger name="com.yahoo.elide.graphql.QueryRunner" level="INFO" />
+    <logger name="com.yahoo.elide.Elide" level="INFO" />
 
     <root level="info">
         <appender-ref ref="STDOUT" />

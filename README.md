@@ -8,6 +8,8 @@ Navi is a production quality analytics reporting UI with _out of the box_ suppor
 
 ## Try it
 
+[![Deploy](https://www.herokucdn.com/deploy/button.svg)](https://heroku.com/deploy)
+
 Start exploring our sample data with the [demo app](https://yahoo.github.io/navi).
 
 ## Requirements

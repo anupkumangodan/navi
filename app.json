@@ -1,7 +1,7 @@
 {
   "name": "Yavin Cloud launch",
-  "description": "Yavin - built with navi & elide",
-  "repository": "https://github.com/anupkumangodan/navi.git",
+  "description": "Yavin is a framework for rapidly building custom data applications that offers both a UI and an API",
+  "repository": "https://github.com/yahoo/navi.git",
   "logo": "https://node-js-sample.herokuapp.com/node.png",
   "stack": "container",
   "addons": [

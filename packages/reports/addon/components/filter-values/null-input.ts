@@ -4,20 +4,14 @@
  */
 import Component from '@glimmer/component';
 import Args from './args-interface';
+import { action } from '@ember/object';
 
 export default class NullInput extends Component<Args> {
-  constructor(owner: unknown, args: Args) {
-    super(owner, args);
-    const {
-      onUpdateFilter,
-      filter: { values }
-    } = this.args;
-
-    /*
-     * Since this operator doesn't require values, set an empty array
-     */
-    if (values.length !== 0) {
-      onUpdateFilter({ values: [] });
+  @action
+  setupNullValues() {
+    const { values } = this.args.filter;
+    if (!(values.length === 1 && values[0] === true)) {
+      this.args.onUpdateFilter({ values: [true] });
     }
   }
 }

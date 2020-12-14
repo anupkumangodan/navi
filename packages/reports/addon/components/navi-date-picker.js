@@ -5,22 +5,30 @@
  * Usage:
  *   <NaviDatePicker
  *      @date={{this.initialDate}}
+ *      @centerDate={{this.centerDate}}
  *      @dateTimePeriod="month"
  *      @onUpdate={{this.handleUpdate}}
  *   />
  */
 import Component from '@ember/component';
-import { get, set, computed, action } from '@ember/object';
+import { set, computed, action } from '@ember/object';
+import { assert } from '@ember/debug';
 import { layout as templateLayout, tagName } from '@ember-decorators/component';
 import layout from '../templates/components/navi-date-picker';
 import moment from 'moment';
 import { range } from 'lodash-es';
-import {
-  getFirstDayEpochIsoDateTimePeriod,
-  getFirstDayOfIsoDateTimePeriod,
-  getLastDayOfIsoDateTimePeriod,
-  getIsoDateTimePeriod
-} from 'navi-data/utils/date';
+import { getFirstDayEpochForGrain, getFirstDayOfGrain, getLastDayOfGrain } from 'navi-data/utils/date';
+
+const isValidCalendarDateMessage = 'The date is UTC and aligned to the start of the day';
+function isValidCalendarDate(date) {
+  if (!moment.isMoment(date) || !date.isUTC()) {
+    return false;
+  }
+  return date
+    .clone()
+    .startOf('day')
+    .isSame(date);
+}
 
 @templateLayout(layout)
 @tagName('')
@@ -31,7 +39,16 @@ class NaviDatePicker extends Component {
    */
   init() {
     super.init(...arguments);
-    this.centerDate = this.centerDate || this.date || getFirstDayOfIsoDateTimePeriod(moment(), this.dateTimePeriod);
+    const { centerDate, date } = this;
+    const localDateAsUTCDay = moment()
+      .utc(true)
+      .startOf('day');
+    const center = centerDate || date || localDateAsUTCDay;
+
+    assert(isValidCalendarDateMessage, isValidCalendarDate(center));
+
+    // convert utc date to local for ember-power-calendar
+    this.centerDate = center.clone().local(true);
   }
 
   /**
@@ -43,16 +60,21 @@ class NaviDatePicker extends Component {
 
     const { previousDate, date } = this;
 
-    if (date !== previousDate) {
-      let newDate = date || undefined;
+    let newDate;
+    if (date && date !== previousDate) {
+      assert(isValidCalendarDateMessage, isValidCalendarDate(date));
+      // convert utc date to local for ember-power-calendar
+      newDate = date.clone().local(true);
+    }
 
+    if (date && !date.isSame(previousDate)) {
       set(this, 'selectedDate', newDate);
       set(this, 'centerDate', newDate);
     }
 
-    //Store old date for rerender logic above
-    set(this, 'previousDate', date);
-    set(this, '_lastTimeDate', date);
+    //Store old date for re-render logic above
+    set(this, 'previousDate', newDate);
+    set(this, '_lastTimeDate', newDate);
   }
 
   /**
@@ -75,7 +97,7 @@ class NaviDatePicker extends Component {
    */
   @computed('dateTimePeriod')
   get minDate() {
-    return new Date(getFirstDayEpochIsoDateTimePeriod(this.dateTimePeriod));
+    return new Date(getFirstDayEpochForGrain(this.dateTimePeriod));
   }
 
   /**
@@ -126,12 +148,35 @@ class NaviDatePicker extends Component {
    * @param {Array} weeks - The weeks being shown for the calendar
    * @returns {string}
    */
+  selectedIsoWeekClass(day, calendar, weeks) {
+    const selected = weeks.flatMap(w => w.days).find(d => d.isSelected);
+    const classes = ['ember-power-calendar-week-day'];
+    if (selected) {
+      const selectedWeekStart = moment(getFirstDayOfGrain(selected.moment, 'isoWeek'));
+      const selectedWeekEnd = moment(getLastDayOfGrain(selectedWeekStart, 'isoWeek'));
+      if (day.moment.isBetween(selectedWeekStart, selectedWeekEnd, undefined, '[]')) {
+        classes.push('ember-power-calendar-day--selected');
+      }
+    }
+
+    return classes.join(' ');
+  }
+
+  /**
+   * Applies a selected class to each day if it lies within the week being selected. This visually represents an
+   * entire week being selected on the calendar even though it is only the first day that is actually selected.
+   *
+   * @param {Object} day - The day to apply a custom style for
+   * @param {Object} calendar - The calendar object being rendered on
+   * @param {Array} weeks - The weeks being shown for the calendar
+   * @returns {string}
+   */
   selectedWeekClass(day, calendar, weeks) {
     const selected = weeks.flatMap(w => w.days).find(d => d.isSelected);
     const classes = ['ember-power-calendar-week-day'];
     if (selected) {
-      const selectedWeekStart = moment(getFirstDayOfIsoDateTimePeriod(selected.moment, 'week'));
-      const selectedWeekEnd = moment(getLastDayOfIsoDateTimePeriod(selectedWeekStart, 'week'));
+      const selectedWeekStart = moment(getFirstDayOfGrain(selected.moment, 'week'));
+      const selectedWeekEnd = moment(getLastDayOfGrain(selectedWeekStart, 'week'));
       if (day.moment.isBetween(selectedWeekStart, selectedWeekEnd, undefined, '[]')) {
         classes.push('ember-power-calendar-day--selected');
       }
@@ -147,7 +192,7 @@ class NaviDatePicker extends Component {
    * @returns {boolean} true if date is the same
    */
   _isDateSameAsLast(newDate) {
-    let lastTime = get(this, '_lastTimeDate');
+    const { _lastTimeDate: lastTime } = this;
 
     set(this, '_lastTimeDate', newDate);
 
@@ -155,7 +200,7 @@ class NaviDatePicker extends Component {
       return false;
     }
 
-    return moment(lastTime).isSame(newDate);
+    return lastTime.isSame(newDate);
   }
 
   /**
@@ -184,14 +229,12 @@ class NaviDatePicker extends Component {
       return;
     }
 
-    // Convert date to start of time period
-    let dateTimePeriod = getIsoDateTimePeriod(this.dateTimePeriod);
-    const selectedDate = moment(newDate).startOf(dateTimePeriod);
-
-    set(this, 'selectedDate', selectedDate);
+    // Use date in local time for selected date
+    set(this, 'selectedDate', newDate);
     const handleUpdate = this.onUpdate;
     if (handleUpdate) {
-      handleUpdate(selectedDate);
+      // convert to utc before passing to action
+      handleUpdate(newDate.clone().utc(true));
     }
   }
 }

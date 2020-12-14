@@ -24,7 +24,7 @@ repositories {
 dependencies {
     implementation(project(":models"))
     implementation("org.springframework.boot:spring-boot-starter-security")
-    implementation("com.yahoo.elide", "elide-spring-boot-starter", "5.0.0-pr27")
+    implementation("com.yahoo.elide", "elide-spring-boot-starter", "5.0.0-pr29")
     implementation("org.jetbrains.kotlin:kotlin-reflect")
     implementation("com.h2database", "h2", "1.3.176")
     implementation( "org.hibernate", "hibernate-validator", "6.1.5.Final")
@@ -79,7 +79,7 @@ tasks.register<Copy>("copyNaviApp") {
     from("../../app/dist")
     into("$buildDir/resources/main/META-INF/resources/ui")
 }
-
+s
 tasks.register<Exec>("execJar") {
     dependsOn("bootJar")
     commandLine = listOf("java", "-jar", "build/libs/app-${project.version}.jar")

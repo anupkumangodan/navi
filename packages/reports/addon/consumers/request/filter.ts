@@ -22,7 +22,7 @@ import ColumnMetadataModel from 'navi-data/models/metadata/column';
 import FilterFragment from 'navi-core/models/bard-request-v2/fragments/filter';
 import RequestFragment from 'navi-core/models/bard-request-v2/request';
 
-const DEFAULT_METRIC_FILTER = {
+const DEFAULT_METRIC_FILTER: { operator: FilterFragment['operator']; values: FilterFragment['values'] } = {
   operator: 'gt',
   values: [0]
 };
@@ -67,6 +67,7 @@ export default class FilterConsumer extends ActionConsumer {
             this.requestActionDispatcher.dispatch(RequestActions.ADD_METRIC_FILTER, route, columnMetadata, parameters);
             break;
           case 'dimension':
+          case 'timeDimension':
             this.requestActionDispatcher.dispatch(
               RequestActions.ADD_DIMENSION_FILTER,
               route,
@@ -74,8 +75,6 @@ export default class FilterConsumer extends ActionConsumer {
               parameters
             );
             break;
-          case 'timeDimension':
-            throw new Error('TODO');
         }
       } else {
         //TODO fix me
@@ -118,7 +117,7 @@ export default class FilterConsumer extends ActionConsumer {
 
       const findDefaultOperator = (type: string) => {
         type = type?.toLowerCase();
-        const opDictionary: Record<string, string> = {
+        const opDictionary: Record<string, FilterFragment['operator']> = {
           time: 'gte',
           date: 'gte',
           number: 'eq',
@@ -128,7 +127,7 @@ export default class FilterConsumer extends ActionConsumer {
         return opDictionary[type] || opDictionary.default;
       };
 
-      let defaultOperator = findDefaultOperator(dimensionMetadataModel.valueType);
+      const defaultOperator = findDefaultOperator(dimensionMetadataModel.valueType);
 
       request.addFilter({
         type: dimensionMetadataModel.metadataType,

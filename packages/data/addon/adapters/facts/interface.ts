@@ -36,7 +36,7 @@ export type FilterOperator =
   | 'nbet'
   | 'contains';
 
-export const SORT_DIRECTIONS = ['desc', 'asc'];
+export const SORT_DIRECTIONS = <const>['desc', 'asc'];
 
 export type Parameters = Dict<string>;
 
@@ -55,7 +55,7 @@ export type Filter = {
   parameters: Parameters;
   type: ColumnType;
   operator: FilterOperator;
-  values: (string | number)[];
+  values: (string | number | boolean)[];
 };
 
 export type Sort = {

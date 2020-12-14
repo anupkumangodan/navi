@@ -8,5 +8,5 @@ build:
   docker:
     web: Dockerfile.web
   config:
-    FOO: bar5
+    FOO: bar6
 

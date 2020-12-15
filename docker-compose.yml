@@ -1,6 +1,6 @@
 version: "3.3"
 services:
   web:
-    build: .
+    image: docker.io/verizonmedia/yavin:demo_local
     ports:
       - "8080:8080"

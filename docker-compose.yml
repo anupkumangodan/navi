@@ -1,6 +1,6 @@
-version: "3.9"
+version: "3.3"
 services:
   web:
-    build: .
+    image: docker.io/verizonmedia/yavin:alpha
     ports:
       - "8080:8080"

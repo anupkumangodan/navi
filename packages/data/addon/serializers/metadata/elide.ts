@@ -29,6 +29,7 @@ export type Connection<T> = {
 type ColumnNode = {
   id: string;
   name: string;
+  friendlyName: string;
   description: string;
   category: string;
   valueType: TODO<string>;
@@ -56,9 +57,11 @@ export type TimeDimensionGrainNode = {
 type TableNode = {
   id: string;
   name: string;
+  friendlyName: string;
   description: string;
   category: string;
   cardinality: typeof CARDINALITY_SIZES[number];
+  isFact: boolean;
   metrics: Connection<MetricNode>;
   dimensions: Connection<DimensionNode>;
   timeDimensions: Connection<TimeDimensionNode>;
@@ -95,6 +98,7 @@ export default class ElideMetadataSerializer extends NaviMetadataSerializer {
         category: table.category,
         description: table.description,
         cardinality: table.cardinality,
+        isFact: table.isFact,
         metricIds: [],
         dimensionIds: [],
         timeDimensionIds: [],
@@ -148,7 +152,7 @@ export default class ElideMetadataSerializer extends NaviMetadataSerializer {
       const { node } = edge;
       const payload: MetricMetadataPayload = {
         id: node.id,
-        name: node.name,
+        name: node.friendlyName,
         description: node.description,
         category: node.category,
         valueType: node.valueType,
@@ -179,7 +183,7 @@ export default class ElideMetadataSerializer extends NaviMetadataSerializer {
       const { node } = edge;
       const payload: ElideDimensionMetadataPayload = {
         id: node.id,
-        name: node.name,
+        name: node.friendlyName,
         description: node.description,
         category: node.category,
         valueType: node.valueType,
@@ -214,7 +218,7 @@ export default class ElideMetadataSerializer extends NaviMetadataSerializer {
       const columnFunctionPayload = this.createTimeGrainColumnFunction(node.id, supportedGrains, source);
       const timeDimensionPayload: TimeDimensionMetadataPayload = {
         id: node.id,
-        name: node.name,
+        name: node.friendlyName,
         description: node.description,
         category: node.category,
         valueType: node.valueType,

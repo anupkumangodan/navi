@@ -8,14 +8,17 @@ const fragment = gql`
   fragment TableFragment on Table {
     id
     name
+    friendlyName
     description
     category
     cardinality
+    isFact
     metrics {
       edges {
         node {
           id
           name
+          friendlyName
           description
           category
           valueType
@@ -30,6 +33,7 @@ const fragment = gql`
         node {
           id
           name
+          friendlyName
           description
           category
           valueType
@@ -47,6 +51,7 @@ const fragment = gql`
         node {
           id
           name
+          friendlyName
           description
           category
           valueType

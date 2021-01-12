@@ -79,9 +79,11 @@ module('Unit | Adapter | metadata/elide', function(hooks) {
     const expectedFields = [
       'id',
       'name',
+      'friendlyName',
       'description',
       'category',
       'cardinality',
+      'isFact',
       'metrics',
       'dimensions',
       'timeDimensions',
@@ -113,7 +115,8 @@ module('Unit | Adapter | metadata/elide', function(hooks) {
           {
             node: {
               id: 'table0.metric0',
-              name: 'Metric 0',
+              name: 'metric0',
+              friendlyName: 'Metric 0',
               description: 'This is metric 0',
               category: 'categoryOne',
               valueType: 'NUMBER',
@@ -127,7 +130,8 @@ module('Unit | Adapter | metadata/elide', function(hooks) {
           {
             node: {
               id: 'table0.metric1',
-              name: 'Metric 1',
+              name: 'metric1',
+              friendlyName: 'Metric 1',
               description: 'This is metric 1',
               category: 'categoryOne',
               valueType: 'NUMBER',
@@ -141,7 +145,8 @@ module('Unit | Adapter | metadata/elide', function(hooks) {
           {
             node: {
               id: 'table0.metric2',
-              name: 'Metric 2',
+              name: 'metric2',
+              friendlyName: 'Metric 2',
               description: 'This is metric 2',
               category: 'categoryOne',
               valueType: 'NUMBER',
@@ -171,7 +176,8 @@ module('Unit | Adapter | metadata/elide', function(hooks) {
               description: 'This is dimension 0',
               expression: null,
               id: 'table0.dimension0',
-              name: 'Dimension 0',
+              name: 'dimension0',
+              friendlyName: 'Dimension 0',
               tableSource: null,
               tags: ['DISPLAY'],
               valueSourceType: 'NONE',
@@ -188,7 +194,8 @@ module('Unit | Adapter | metadata/elide', function(hooks) {
               description: 'This is dimension 1',
               expression: null,
               id: 'table0.dimension1',
-              name: 'Dimension 1',
+              name: 'dimension1',
+              friendlyName: 'Dimension 1',
               tableSource: null,
               tags: ['DISPLAY'],
               valueSourceType: 'ENUM',
@@ -211,7 +218,8 @@ module('Unit | Adapter | metadata/elide', function(hooks) {
               description: 'This is dimension 2',
               expression: null,
               id: 'table0.dimension2',
-              name: 'Dimension 2',
+              name: 'dimension2',
+              friendlyName: 'Dimension 2',
               tableSource: 'table0.dimension0',
               tags: ['DISPLAY'],
               valueSourceType: 'TABLE',
@@ -233,7 +241,8 @@ module('Unit | Adapter | metadata/elide', function(hooks) {
           {
             node: {
               id: 'table1.metric3',
-              name: 'Metric 3',
+              name: 'metric3',
+              friendlyName: 'Metric 3',
               description: 'This is metric 3',
               category: 'categoryOne',
               valueType: 'NUMBER',
@@ -247,7 +256,8 @@ module('Unit | Adapter | metadata/elide', function(hooks) {
           {
             node: {
               id: 'table1.metric4',
-              name: 'Metric 4',
+              name: 'metric4',
+              friendlyName: 'Metric 4',
               description: 'This is metric 4',
               category: 'categoryOne',
               valueType: 'NUMBER',
@@ -293,16 +303,19 @@ module('Unit | Adapter | metadata/elide', function(hooks) {
               __typename: 'TableEdge',
               node: {
                 id: 'table0',
-                name: 'Table 0',
+                name: 'table0',
+                friendlyName: 'Table 0',
                 description: 'This is Table 0',
                 category: 'categoryOne',
                 cardinality: 'SMALL',
+                isFact: true,
                 metrics: {
                   edges: [
                     {
                       node: {
                         id: 'table0.metric0',
-                        name: 'Metric 0',
+                        name: 'metric0',
+                        friendlyName: 'Metric 0',
                         description: 'This is metric 0',
                         category: 'categoryOne',
                         valueType: 'NUMBER',
@@ -316,7 +329,8 @@ module('Unit | Adapter | metadata/elide', function(hooks) {
                     {
                       node: {
                         id: 'table0.metric1',
-                        name: 'Metric 1',
+                        name: 'metric1',
+                        friendlyName: 'Metric 1',
                         description: 'This is metric 1',
                         category: 'categoryOne',
                         valueType: 'NUMBER',
@@ -330,7 +344,8 @@ module('Unit | Adapter | metadata/elide', function(hooks) {
                     {
                       node: {
                         id: 'table0.metric2',
-                        name: 'Metric 2',
+                        name: 'metric2',
+                        friendlyName: 'Metric 2',
                         description: 'This is metric 2',
                         category: 'categoryOne',
                         valueType: 'NUMBER',
@@ -355,7 +370,8 @@ module('Unit | Adapter | metadata/elide', function(hooks) {
                         description: 'This is dimension 0',
                         expression: null,
                         id: 'table0.dimension0',
-                        name: 'Dimension 0',
+                        name: 'dimension0',
+                        friendlyName: 'Dimension 0',
                         tableSource: null,
                         tags: ['DISPLAY'],
                         valueSourceType: 'NONE',
@@ -372,7 +388,8 @@ module('Unit | Adapter | metadata/elide', function(hooks) {
                         description: 'This is dimension 1',
                         expression: null,
                         id: 'table0.dimension1',
-                        name: 'Dimension 1',
+                        name: 'dimension1',
+                        friendlyName: 'Dimension 1',
                         tableSource: null,
                         tags: ['DISPLAY'],
                         valueSourceType: 'ENUM',
@@ -395,7 +412,8 @@ module('Unit | Adapter | metadata/elide', function(hooks) {
                         description: 'This is dimension 2',
                         expression: null,
                         id: 'table0.dimension2',
-                        name: 'Dimension 2',
+                        name: 'dimension2',
+                        friendlyName: 'Dimension 2',
                         tableSource: 'table0.dimension0',
                         tags: ['DISPLAY'],
                         valueSourceType: 'TABLE',

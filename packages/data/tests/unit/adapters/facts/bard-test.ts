@@ -2,8 +2,7 @@ import { module, test } from 'qunit';
 import { setupTest } from 'ember-qunit';
 import Pretender, { Server as PretenderServer, ResponseData } from 'pretender';
 import config from 'ember-get-config';
-import { assign } from '@ember/polyfills';
-import { RequestV2, Filter } from 'navi-data/adapters/facts/interface';
+import { RequestV2 } from 'navi-data/adapters/facts/interface';
 import BardFactsAdapter from 'navi-data/adapters/facts/bard';
 import { TestContext } from 'ember-test-helpers';
 
@@ -111,9 +110,7 @@ const TestRequest: RequestV2 = {
   },
   MockBardResponse: ResponseData = [200, { 'Content-Type': 'application/json' }, JSON.stringify(Response)];
 
-let Adapter: BardFactsAdapter,
-  Server: PretenderServer,
-  aliasFunction = (alias: string) => (alias === 'a' ? 'r(p=123)' : alias);
+let Adapter: BardFactsAdapter, Server: PretenderServer;
 
 module('Unit | Adapter | facts/bard', function(hooks) {
   setupTest(hooks);
@@ -378,7 +375,7 @@ module('Unit | Adapter | facts/bard', function(hooks) {
   });
 
   test('_buildFiltersParam', function(assert) {
-    assert.expect(7);
+    assert.expect(9);
 
     let singleFilter: RequestV2 = {
       ...EmptyRequest,
@@ -408,6 +405,34 @@ module('Unit | Adapter | facts/bard', function(hooks) {
       Adapter._buildFiltersParam(emptyFilters),
       undefined,
       '_buildFiltersParam returns undefined with empty filters'
+    );
+
+    const emptyFilterValues: RequestV2 = {
+      ...EmptyRequest,
+      filters: [
+        { field: 'd1', parameters: { field: 'desc' }, type: 'dimension', operator: 'in', values: ['v1', 'v2'] },
+        { field: 'd2', parameters: { field: 'id' }, type: 'dimension', operator: 'in', values: [] },
+        { field: 'd2', parameters: { field: 'id' }, type: 'dimension', operator: 'notin', values: ['v3', 'v4'] }
+      ]
+    };
+    assert.equal(
+      Adapter._buildFiltersParam(emptyFilterValues),
+      'd1|desc-in["v1","v2"],d2|id-notin["v3","v4"]',
+      '_buildFiltersParam skips over empty filter values'
+    );
+
+    const allEmptyFilterValues: RequestV2 = {
+      ...EmptyRequest,
+      filters: [
+        { field: 'd1', parameters: { field: 'desc' }, type: 'dimension', operator: 'in', values: [] },
+        { field: 'd2', parameters: { field: 'id' }, type: 'dimension', operator: 'in', values: [] },
+        { field: 'd2', parameters: { field: 'id' }, type: 'dimension', operator: 'notin', values: [] }
+      ]
+    };
+    assert.equal(
+      Adapter._buildFiltersParam(allEmptyFilterValues),
+      undefined,
+      '_buildFiltersParam removes all empty filters'
     );
 
     let noDimensionFilters: RequestV2 = {
@@ -476,18 +501,11 @@ module('Unit | Adapter | facts/bard', function(hooks) {
   });
 
   test('_buildSortParam', function(assert) {
-    assert.expect(7);
+    assert.expect(5);
 
     let singleSort: RequestV2 = {
       ...EmptyRequest,
-      sorts: [
-        {
-          type: 'metric',
-          field: 'm1',
-          parameters: {},
-          direction: 'asc'
-        }
-      ]
+      sorts: [{ type: 'metric', field: 'm1', parameters: {}, direction: 'asc' }]
     };
     assert.equal(
       Adapter._buildSortParam(singleSort),
@@ -499,10 +517,7 @@ module('Unit | Adapter | facts/bard', function(hooks) {
       ...EmptyRequest,
       sorts: [
         //@ts-expect-error
-        {
-          type: 'metric',
-          field: 'm1'
-        }
+        { type: 'metric', field: 'm1' }
       ]
     };
     assert.equal(
@@ -514,68 +529,14 @@ module('Unit | Adapter | facts/bard', function(hooks) {
     let manySorts: RequestV2 = {
       ...EmptyRequest,
       sorts: [
-        {
-          type: 'metric',
-          parameters: {},
-          field: 'm1',
-          direction: 'asc'
-        },
-        {
-          type: 'metric',
-          parameters: {},
-          field: 'm2',
-          direction: 'asc'
-        }
+        { type: 'metric', parameters: {}, field: 'm1', direction: 'asc' },
+        { type: 'metric', parameters: {}, field: 'm2', direction: 'asc' }
       ]
     };
     assert.equal(
       Adapter._buildSortParam(manySorts),
       'm1|asc,m2|asc',
       '_buildSortParam built the correct string for multiple sorts'
-    );
-
-    assert.equal(
-      Adapter._buildSortParam(
-        {
-          ...EmptyRequest,
-          sorts: [
-            {
-              type: 'metric',
-              field: 'a',
-              parameters: {},
-              direction: 'asc'
-            }
-          ]
-        },
-        aliasFunction
-      ),
-      'r(p=123)|asc',
-      'sort param with aliases work'
-    );
-
-    assert.equal(
-      Adapter._buildSortParam(
-        {
-          ...EmptyRequest,
-          sorts: [
-            {
-              type: 'metric',
-              field: 'a',
-              parameters: {},
-              direction: 'asc'
-            },
-            {
-              type: 'metric',
-              parameters: {},
-              field: 'm1',
-              direction: 'desc'
-            }
-          ]
-        },
-        aliasFunction
-      ),
-      'r(p=123)|asc,m1|desc',
-      'sort param with aliases mixed with non aliases work'
     );
 
     let emptySorts = { ...EmptyRequest };
@@ -602,19 +563,11 @@ module('Unit | Adapter | facts/bard', function(hooks) {
   });
 
   test('_buildHavingParam', function(assert) {
-    assert.expect(6);
+    assert.expect(7);
 
     let singleHaving: RequestV2 = {
       ...EmptyRequest,
-      filters: [
-        {
-          field: 'm1',
-          type: 'metric',
-          parameters: {},
-          operator: 'gt',
-          values: [0]
-        }
-      ]
+      filters: [{ field: 'm1', type: 'metric', parameters: {}, operator: 'gt', values: [0] }]
     };
     assert.equal(
       Adapter._buildHavingParam(singleHaving),
@@ -625,20 +578,8 @@ module('Unit | Adapter | facts/bard', function(hooks) {
     let manyHavings: RequestV2 = {
       ...EmptyRequest,
       filters: [
-        {
-          field: 'm1',
-          type: 'metric',
-          parameters: {},
-          operator: 'gt',
-          values: [0]
-        },
-        {
-          field: 'm2',
-          type: 'metric',
-          parameters: {},
-          operator: 'lte',
-          values: [10]
-        }
+        { field: 'm1', type: 'metric', parameters: {}, operator: 'gt', values: [0] },
+        { field: 'm2', type: 'metric', parameters: {}, operator: 'lte', values: [10] }
       ]
     };
     assert.equal(
@@ -654,6 +595,34 @@ module('Unit | Adapter | facts/bard', function(hooks) {
       '_buildHavingParam returns undefined with empty having'
     );
 
+    const emptyFilterValues: RequestV2 = {
+      ...EmptyRequest,
+      filters: [
+        { field: 'm1', type: 'metric', parameters: {}, operator: 'gt', values: [0] },
+        { field: 'm2', type: 'metric', parameters: {}, operator: 'gt', values: [] },
+        { field: 'm3', type: 'metric', parameters: {}, operator: 'lte', values: [10] }
+      ]
+    };
+    assert.equal(
+      Adapter._buildHavingParam(emptyFilterValues),
+      'm1-gt[0],m3-lte[10]',
+      '_buildHavingParam skips empty filter values'
+    );
+
+    const allEmptyFilterValues: RequestV2 = {
+      ...EmptyRequest,
+      filters: [
+        { field: 'm1', type: 'metric', parameters: {}, operator: 'gt', values: [] },
+        { field: 'm2', type: 'metric', parameters: {}, operator: 'gt', values: [] },
+        { field: 'm3', type: 'metric', parameters: {}, operator: 'lte', values: [] }
+      ]
+    };
+    assert.equal(
+      Adapter._buildHavingParam(allEmptyFilterValues),
+      undefined,
+      '_buildHavingParam skips all empty filter values'
+    );
+
     let onlyDimFilters: RequestV2 = {
       ...EmptyRequest,
       filters: [{ field: 'foo', type: 'dimension', parameters: { field: 'id' }, operator: 'gt', values: [0] }]
@@ -666,45 +635,11 @@ module('Unit | Adapter | facts/bard', function(hooks) {
 
     let havingValueArray: RequestV2 = {
       ...EmptyRequest,
-      filters: [
-        {
-          field: 'm1',
-          type: 'metric',
-          parameters: {},
-          operator: 'gt',
-          values: [1, 2, 3]
-        }
-      ]
+      filters: [{ field: 'm1', type: 'metric', parameters: {}, operator: 'gt', values: [1, 2, 3] }]
     };
     assert.equal(
       Adapter._buildHavingParam(havingValueArray),
       'm1-gt[1,2,3]',
-      '_buildHavingParam built the correct string when having a `values` array'
-    );
-
-    let aliasedHaving: RequestV2 = {
-      ...EmptyRequest,
-      filters: [
-        {
-          field: 'm1',
-          type: 'metric',
-          parameters: {},
-          operator: 'gt',
-          values: [1, 2, 3]
-        },
-        {
-          field: 'a',
-          type: 'metric',
-          parameters: {},
-          operator: 'lt',
-          values: [50]
-        }
-      ]
-    };
-
-    assert.equal(
-      Adapter._buildHavingParam(aliasedHaving, aliasFunction),
-      'm1-gt[1,2,3],r(p=123)-lt[50]',
       '_buildHavingParam built the correct string when having a `values` array'
     );
   });
@@ -721,16 +656,8 @@ module('Unit | Adapter | facts/bard', function(hooks) {
     const twoDateTime: RequestV2 = {
       ...EmptyRequest,
       columns: [
-        {
-          field: '.dateTime',
-          type: 'timeDimension',
-          parameters: { grain: 'all' }
-        },
-        {
-          field: '.dateTime',
-          type: 'timeDimension',
-          parameters: { grain: 'week' }
-        }
+        { field: '.dateTime', type: 'timeDimension', parameters: { grain: 'all' } },
+        { field: '.dateTime', type: 'timeDimension', parameters: { grain: 'week' } }
       ]
     };
 
@@ -756,7 +683,7 @@ module('Unit | Adapter | facts/bard', function(hooks) {
   });
 
   test('_buildQuery', function(assert) {
-    assert.expect(7);
+    assert.expect(5);
 
     assert.deepEqual(
       Adapter._buildQuery(TestRequest),
@@ -806,14 +733,7 @@ module('Unit | Adapter | facts/bard', function(hooks) {
 
     let sortRequest: RequestV2 = {
       ...TestRequest,
-      sorts: [
-        {
-          type: 'metric',
-          field: 'm1',
-          parameters: {},
-          direction: 'desc'
-        }
-      ]
+      sorts: [{ type: 'metric', field: 'm1', parameters: {}, direction: 'desc' }]
     };
     assert.deepEqual(
       Adapter._buildQuery(sortRequest),
@@ -826,53 +746,6 @@ module('Unit | Adapter | facts/bard', function(hooks) {
         sort: 'm1|desc'
       },
       '_buildQuery correctly built the query object for a request with sort'
-    );
-
-    sortRequest = {
-      ...TestRequest,
-      sorts: [
-        {
-          type: 'metric',
-          field: 'a',
-          parameters: {},
-          direction: 'desc'
-        }
-      ]
-    };
-    assert.deepEqual(
-      Adapter._buildQuery(sortRequest),
-      {
-        dateTime: '2015-01-03/2015-01-04',
-        filters: 'd3|id-in["v1","v2"],d4|id-in["v3","v4"],d5|id-notnull[""]',
-        format: 'json',
-        metrics: 'm1,m2,r(p=123)',
-        having: 'm1-gt[0]',
-        sort: 'r(p=123)|desc'
-      },
-      '_buildQuery correctly built the query object for an aliased with sort'
-    );
-
-    const aliasedHaving: Filter = {
-      type: 'metric',
-      field: 'a',
-      parameters: {},
-      operator: 'lt',
-      values: [50]
-    };
-    const havingRequest = assign({}, TestRequest, {
-      filters: assign([], TestRequest.filters).concat(aliasedHaving)
-    });
-
-    assert.deepEqual(
-      Adapter._buildQuery(havingRequest),
-      {
-        dateTime: '2015-01-03/2015-01-04',
-        filters: 'd3|id-in["v1","v2"],d4|id-in["v3","v4"],d5|id-notnull[""]',
-        format: 'json',
-        metrics: 'm1,m2,r(p=123)',
-        having: 'm1-gt[0],r(p=123)-lt[50]'
-      },
-      '_buildQuery correctly built the query object for an aliased having'
     );
 
     assert.deepEqual(
@@ -1095,18 +968,8 @@ module('Unit | Adapter | facts/bard', function(hooks) {
         }
       ],
       sorts: [
-        {
-          type: 'metric',
-          field: 'm1',
-          parameters: {},
-          direction: 'desc'
-        },
-        {
-          type: 'metric',
-          field: 'm2',
-          parameters: {},
-          direction: 'desc'
-        }
+        { type: 'metric', field: 'm1', parameters: {}, direction: 'desc' },
+        { type: 'metric', field: 'm2', parameters: {}, direction: 'desc' }
       ]
     };
     assert.equal(
@@ -1146,12 +1009,7 @@ module('Unit | Adapter | facts/bard', function(hooks) {
     assert.deepEqual(
       result,
       {
-        rows: [
-          {
-            table: 'table1',
-            grain: 'grain1'
-          }
-        ],
+        rows: [{ table: 'table1', grain: 'grain1' }],
         meta: {
           pagination: {
             page: '1',

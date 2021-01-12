@@ -7,7 +7,7 @@
   "private": true,
   "repository": {
     "type": "git",
-    "url": "https://github.com/yahoo/navi"
+    "url": "https://github.com/yahoo/yavin"
   },
   "scripts": {
     "build-ui_": "cd packages/app && npm run build",

@@ -4,9 +4,11 @@ import { render } from '@ember/test-helpers';
 import { helper } from '@ember/component/helper';
 import hbs from 'htmlbars-inline-precompile';
 import { setupMirage } from 'ember-cli-mirage/test-support';
+import TableMetadataModel from 'navi-data/models/metadata/table';
 
 let MetadataService, Store;
 
+const TEMPLATE = hbs`<ReportBuilder @report={{this.report}} />`;
 module('Integration | Component | report builder', function(hooks) {
   setupRenderingTest(hooks);
   setupMirage(hooks);
@@ -21,11 +23,14 @@ module('Integration | Component | report builder', function(hooks) {
     this.set(
       'report',
       Store.createRecord('report', {
-        request: Store.createFragment('bard-request/request', {
-          logicalTable: Store.createFragment('bard-request/fragments/logicalTable', {
-            table: MetadataService.getById('table', 'tableA'),
-            timeGrain: 'day'
-          })
+        request: Store.createFragment('bard-request-v2/request', {
+          table: 'tableA',
+          dataSource: 'bardOne',
+          limit: null,
+          requestVersion: '2.0',
+          filters: [],
+          columns: [],
+          sorts: []
         }),
         visualization: {}
       })
@@ -36,17 +41,22 @@ module('Integration | Component | report builder', function(hooks) {
     assert.expect(2);
     //reset meta data and load only one table
     MetadataService.keg.resetByType('metadata/table');
-    MetadataService.loadMetadataForType('table', [
-      {
-        id: 'tableA',
-        name: 'Table A',
-        description: 'Table A'
-      }
-    ]);
+    MetadataService.loadMetadataForType(
+      'table',
+      [
+        TableMetadataModel.create({
+          id: 'tableA',
+          name: 'Table A',
+          description: 'Table A',
+          metricIds: [],
+          dimensionIds: [],
+          timeDimensionIds: []
+        })
+      ],
+      'bardOne'
+    );
 
-    await render(hbs`{{report-builder
-      report=report
-    }}`);
+    await render(TEMPLATE);
 
     assert.dom('.report-builder__main').isVisible('Report builder renders');
     assert.dom('.navi-table-select').isNotVisible('Table selector does not render with only one table');
@@ -55,9 +65,7 @@ module('Integration | Component | report builder', function(hooks) {
   test('Multiple tables in meta should show table selector', async function(assert) {
     assert.expect(1);
 
-    await render(hbs`{{report-builder
-      report=report
-    }}`);
+    await render(TEMPLATE);
 
     assert.dom('.navi-table-select').isVisible('Table renders when there are multiple tables');
   });

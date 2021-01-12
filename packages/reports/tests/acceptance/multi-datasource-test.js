@@ -22,6 +22,8 @@ module('Acceptance | multi-datasource report builder', function(hooks) {
   test('multi datasource report', async function(assert) {
     assert.expect(14);
 
+    config.navi.FEATURES.exportFileTypes = ['csv', 'pdf', 'png'];
+
     await visit('/reports/new');
 
     await selectChoose('.navi-table-select__dropdown', 'Inventory');
@@ -105,10 +107,15 @@ module('Acceptance | multi-datasource report builder', function(hooks) {
     assert
       .dom(findAll('.multiple-format-export__dropdown a').filter(el => el.textContent.trim() === 'CSV')[0])
       .hasAttribute('href', /^https:\/\/data2.naviapp.io\/\S+$/, 'uses csv export from right datasource');
+
+    config.navi.FEATURES.exportFileTypes = [];
   });
 
   test('multi datasource saved report', async function(assert) {
     assert.expect(14);
+
+    let originalFlag = config.navi.FEATURES.exportFileTypes;
+    config.navi.FEATURES.exportFileTypes = ['csv', 'pdf', 'png'];
 
     await visit('/reports/13/view');
 
@@ -147,7 +154,7 @@ module('Acceptance | multi-datasource report builder', function(hooks) {
     assert
       .dom('.get-api-modal-container input')
       .hasValue(
-        'https://data.naviapp.io/v1/data/network/day/property/?dateTime=2015-10-02%2F2015-10-14&metrics=adClicks&format=json',
+        'https://data.naviapp.io/v1/data/network/day/property/?dateTime=2015-10-02T00%3A00%3A00.000Z%2F2015-10-14T00%3A00%3A00.000Z&metrics=adClicks&format=json',
         'shows api url from bardTwo datasource'
       );
 
@@ -157,7 +164,7 @@ module('Acceptance | multi-datasource report builder', function(hooks) {
       .dom(findAll('.multiple-format-export__dropdown a').filter(el => el.textContent.trim() === 'CSV')[0])
       .hasAttribute(
         'href',
-        'https://data.naviapp.io/v1/data/network/day/property/?dateTime=2015-10-02%2F2015-10-14&metrics=adClicks&format=csv',
+        'https://data.naviapp.io/v1/data/network/day/property/?dateTime=2015-10-02T00%3A00%3A00.000Z%2F2015-10-14T00%3A00%3A00.000Z&metrics=adClicks&format=csv',
         'uses csv export from right datasource'
       );
 
@@ -177,5 +184,7 @@ module('Acceptance | multi-datasource report builder', function(hooks) {
       'Only property is selected once table is changed'
     );
     assert.deepEqual(await getAllSelected('metric'), ['Ad Clicks'], 'Only Ad Clicks is selected once table is changed');
+
+    config.navi.FEATURES.exportFileTypes = originalFlag;
   });
 });

@@ -79,7 +79,7 @@ tasks.register<Copy>("copyNaviApp") {
     from("../../app/dist")
     into("$buildDir/resources/main/META-INF/resources/ui")
 }
-s
+
 tasks.register<Exec>("execJar") {
     dependsOn("bootJar")
     commandLine = listOf("java", "-jar", "build/libs/app-${project.version}.jar")

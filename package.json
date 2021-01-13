@@ -10,8 +10,8 @@
     "url": "https://github.com/yahoo/yavin"
   },
   "scripts": {
-    "build-ui_": "cd packages/app && npm run build",
     "build-ui": "lerna run build --scope navi-app --stream",
+    "postinstall": "lerna bootstrap --hoist --ci --concurrency=2 --loglevel warn",
     "start": "cd packages/webservice && ./gradlew bootRun",
     "test": "lerna run test --stream",
     "lerna-ci-publish": "lerna publish --canary --exact preminor --force-publish=* --yes",

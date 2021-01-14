@@ -23,7 +23,6 @@ import javax.persistence.JoinColumn
 import javax.persistence.JoinTable
 import javax.persistence.ManyToMany
 import javax.persistence.OneToMany
-import javax.persistence.Table
 import javax.persistence.Temporal
 import javax.persistence.TemporalType
 import javax.validation.constraints.NotBlank
@@ -37,7 +36,6 @@ import javax.validation.constraints.NotBlank
     phase = LifeCycleHookBinding.TransactionPhase.PRECOMMIT,
     hook = UserValidationHook::class
 )
-@Table(name = "YavinUser")
 class User : HasRoles {
 
     @Id

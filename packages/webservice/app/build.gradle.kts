@@ -57,10 +57,6 @@ tasks.withType<KotlinCompile> {
     }
 }
 
-tasks.register<NpmTask>("installEmber") {
-    setArgs(listOf("install","-g","ember-cli"))
-}
-
 tasks.register<NpmTask>("installUIDependencies") {
     setArgs(listOf("ci","-verbose"))
     setExecOverrides(closureOf<ExecSpec> {

@@ -14,7 +14,7 @@ https://hub.docker.com/repository/docker/verizonmedia/yavin/general
 
 ```
 org: verizonmedia
-repo: yavin
+repo: yavin_base, yavin_demo, yavin
 ```
 
 # Docker file for base image
@@ -28,10 +28,10 @@ Dockerfile.alpine
 ```
 
 ## Yavin Base image
-For any other environments like heroku (or cloud) use base image ```verizonmedia/yavin:alpha```
+For any other environments like heroku (or cloud) use base image ```verizonmedia/yavin_base:latest```
 In your custom Dockerfile you can start as:
 ```
-FROM verizonmedia/yavin:alpha
+FROM verizonmedia/yavin_base:latest
 ```
 
 # Docker file for local demo
@@ -42,10 +42,10 @@ Dockerfile.demo_local
 ```
 
 ## Yavin Local demo image
-For any other environments like heroku (or cloud) use base image ```verizonmedia/yavin:demo_local```
+For any other environments like heroku (or cloud) use base image ```verizonmedia/yavin_demo:latest```
 To run yavin demo using docker container:
 ```
-docker run 9999:8080 verizonmedia/yavin:demo_local
+docker run -p 9999:8080 verizonmedia/yavin_demo:latest
 ```
 
 # Heroku launch

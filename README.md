@@ -17,6 +17,8 @@ Build reports, assemble dashboards, and explore data with ad-hoc queries.
 
 Jump right in with the [demo app](https://yahoo.github.io/yavin) or run it yourself by following our [quick start guide](https://yavin.dev/pages/guide/02-start.html).
 
+![yavin demo app landing page](assets/yavin-demo-app.png)
+
 ## Packages
 
 You can install the individual packages via npm

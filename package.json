@@ -11,7 +11,7 @@
   },
   "scripts": {
     "build-ui": "lerna run build --scope navi-app --stream",
-    "postinstall": "lerna bootstrap --hoist --ci --concurrency=2 --loglevel warn",
+    "postinstall": "lerna bootstrap --concurrency 2 --ci",
     "start": "cd packages/webservice && ./gradlew bootRun",
     "test": "lerna run test --stream",
     "lerna-ci-publish": "lerna publish --canary --exact preminor --force-publish=* --yes",

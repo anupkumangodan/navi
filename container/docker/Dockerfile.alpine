@@ -17,4 +17,6 @@ WORKDIR /usr/src/yavin/packages/webservice
 RUN ./gradlew bootJar -x installUIDependencies
 RUN cp -r ./../app/dist app/build/resources/main/META-INF/resources/ui
 
-
+WORKDIR /usr/src/yavin
+RUN find packages -type d -maxdepth 1 -not -path "packages/webservice" -not -path "packages" -exec rm -rf {} \;
+RUN rm -rf node_modules

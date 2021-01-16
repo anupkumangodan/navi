@@ -35,7 +35,6 @@ dependencies {
         exclude(group = "org.junit.vintage", module = "junit-vintage-engine")
     }
     testImplementation("com.jayway.restassured", "rest-assured", "2.9.0")
-    implementation("org.postgresql", "postgresql", "42.2.7")
 
 }
 

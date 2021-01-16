@@ -1,8 +1,9 @@
+# Run Yavin in Docker containers
 yavin can be easily deployed using docker containers.We maintain
 multiple dockerfiles for different types of images. However there
 will be one common base image.
 
-# Docker registry
+## Docker registry
 
 We use docker hub to keep our images updated and available.
 Docker hub is integrated back to github. It will detect changes
@@ -17,7 +18,7 @@ org: verizonmedia
 repo: yavin_base, yavin_demo, yavin
 ```
 
-# Docker file for base image
+## Docker file for base image
 
 We create a base image using Alpine Linux. This base image
 will have all the requried dependencies available. It will
@@ -34,7 +35,7 @@ In your custom Dockerfile you can start as:
 FROM verizonmedia/yavin_base:latest
 ```
 
-# Docker file for local demo
+## Docker file for local demo
 docker build -f container/docker/Docker.alpine
 
 ```
@@ -48,5 +49,5 @@ To run yavin demo using docker container:
 docker run -p 9999:8080 verizonmedia/yavin_demo:latest
 ```
 
-# Heroku launch
+## Heroku launch
 Coming soon...

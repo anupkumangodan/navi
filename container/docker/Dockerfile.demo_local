@@ -1,4 +1,4 @@
 FROM verizonmedia/yavin_base:latest
 
 WORKDIR /usr/src/yavin
-CMD java -Xmx224m -jar /usr/src/yavin/packages/webservice/app/build/libs/app-*.jar
+CMD java -Xmx224m -jar /usr/local/lib/app-*.jar

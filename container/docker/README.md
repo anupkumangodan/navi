@@ -1,6 +1,6 @@
 # Run Yavin in Docker containers
 
-yavin can be easily deployed using docker containers.We maintain multiple dockerfiles for different types of images. However there will be one common base image.
+Yavin can be easily deployed using docker containers. We maintain multiple dockerfiles for different types of images. However there will be one common base image.
 
 ## Docker registry
 

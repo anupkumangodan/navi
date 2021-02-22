@@ -1,27 +1,27 @@
 import { run } from '@ember/runloop';
 import { module, test } from 'qunit';
 import { setupRenderingTest } from 'ember-qunit';
-import { render, settled, click, fillIn, blur } from '@ember/test-helpers';
+import { render, settled, click, fillIn } from '@ember/test-helpers';
 import hbs from 'htmlbars-inline-precompile';
 
 let Template = hbs`
-  {{number-format-selector
-    format=format
-    onUpdateFormat=(action onUpdateFormat)
-  }}`;
+  <NumberFormatSelector
+    @format={{this.format}}
+    @onUpdateFormat={{this.onUpdateFormat}}
+  />`;
 
-module('Integration | Component | number format selector', function(hooks) {
+module('Integration | Component | number format selector', function (hooks) {
   setupRenderingTest(hooks);
 
-  hooks.beforeEach(function() {
+  hooks.beforeEach(function () {
     this.set('format', '$0,0[.]00');
-    this.set('onUpdateFormat', () => null);
+    this.set('onUpdateFormat', (newFormat) => this.set('format', newFormat));
   });
 
-  test('updateFormat from radio button', async function(assert) {
+  test('updateFormat from radio button', async function (assert) {
     assert.expect(1);
 
-    this.set('onUpdateFormat', result => {
+    this.set('onUpdateFormat', (result) => {
       assert.equal(result, '0,0.00', 'onUpdateFormat action is called by radio button');
     });
 
@@ -30,10 +30,10 @@ module('Integration | Component | number format selector', function(hooks) {
     await click('.number-format-selector__radio-number input');
   });
 
-  test('clearFormat', async function(assert) {
+  test('clearFormat', async function (assert) {
     assert.expect(1);
 
-    this.set('onUpdateFormat', result => {
+    this.set('onUpdateFormat', (result) => {
       assert.equal(result, '', 'onUpdateFormat action is called by custom format radio button');
     });
 
@@ -42,14 +42,13 @@ module('Integration | Component | number format selector', function(hooks) {
     await run(() => click('.number-format-selector__radio-custom input'));
   });
 
-  test('highlight correct format when customFormat is changed', async function(assert) {
+  test('highlight correct format when customFormat is changed', async function (assert) {
     assert.expect(2);
 
     await render(Template);
 
     await run(async () => {
       await fillIn('.number-format-selector__format-input', '$0,0[.]00a');
-      await blur('.number-format-selector__format-input');
     });
 
     await settled();
@@ -60,7 +59,6 @@ module('Integration | Component | number format selector', function(hooks) {
 
     await run(async () => {
       await fillIn('.number-format-selector__format-input', '0,0.00');
-      await blur('.number-format-selector__format-input');
     });
 
     await settled();

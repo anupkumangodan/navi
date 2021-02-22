@@ -4,6 +4,7 @@
  */
 import Controller from '@ember/controller';
 import { action, set, computed } from '@ember/object';
+import { inject as service } from '@ember/service';
 import { assert } from '@ember/debug';
 import fade from 'ember-animated/transitions/fade';
 
@@ -11,24 +12,20 @@ const REPORT_STATE = {
   RUNNING: 'running',
   EDITING: 'editing',
   COMPLETED: 'completed',
-  FAILED: 'failed'
+  FAILED: 'failed',
 };
 
 export default class ReportsReportController extends Controller {
-  /**
-   * @property {Boolean} showSaveAs - whether the save as dialog is showing
-   */
-  showSaveAs = false;
-
+  @service screen;
   /**
    * @property {Boolean} isFiltersCollapsed
    */
-  isFiltersCollapsed = false;
+  isFiltersCollapsed;
 
   /**
    * @property {Boolean} isColumnDrawerOpen - Display column config or not
    */
-  isColumnDrawerOpen = true;
+  isColumnDrawerOpen;
 
   /**
    * @property {Object} modifiedRequest - the serialized request after calling `onUpdateReport`
@@ -39,6 +36,13 @@ export default class ReportsReportController extends Controller {
    * @property {Object} lastAddedColumn - the column that has been added last
    */
   lastAddedColumn = null;
+
+  init() {
+    super.init(...arguments);
+    const { isMobile } = this.screen;
+    set(this, 'isColumnDrawerOpen', !isMobile);
+    set(this, 'isFiltersCollapsed', isMobile);
+  }
 
   /**
    * @property {String} reportState - state of the the report
@@ -83,14 +87,6 @@ export default class ReportsReportController extends Controller {
   @computed('reportState')
   get didReportFail() {
     return this.reportState === REPORT_STATE.FAILED;
-  }
-
-  /**
-   * Closes save as modal
-   */
-  @action
-  closeSaveAs() {
-    set(this, 'showSaveAs', false);
   }
 
   /**

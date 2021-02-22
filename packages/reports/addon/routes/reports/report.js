@@ -35,7 +35,7 @@ export default Route.extend({
    * @property {String} defaultVisualizationType - visualization type if not
    *                                               specified in report
    */
-  defaultVisualizationType: computed(function() {
+  defaultVisualizationType: computed(function () {
     return get(this, 'naviVisualizations').defaultVisualization();
   }),
 
@@ -74,10 +74,8 @@ export default Route.extend({
   setupController(controller) {
     this._super(...arguments);
     controller.setProperties({
-      showSaveAs: false,
-      isFiltersCollapsed: false,
       modifiedRequest: null,
-      lastAddedColumn: null
+      lastAddedColumn: null,
     });
   },
 
@@ -184,20 +182,20 @@ export default Route.extend({
       report
         .save()
         .then(() => {
-          get(this, 'naviNotifications').add({
-            message: 'Report was successfully saved!',
-            type: 'success',
-            timeout: 'short'
+          this.naviNotifications.add({
+            title: 'Report saved',
+            style: 'success',
+            timeout: 'short',
           });
 
           // Switch from temp id to permanent id
           this.replaceWith('reports.report.view', get(report, 'id'));
         })
         .catch(() => {
-          get(this, 'naviNotifications').add({
-            message: 'OOPS! An error occurred while saving the report',
-            type: 'danger',
-            timeout: 'medium'
+          this.naviNotifications.add({
+            title: 'An error occurred while saving the report',
+            style: 'danger',
+            timeout: 'medium',
           });
         });
     },
@@ -278,16 +276,16 @@ export default Route.extend({
       user.save().catch(() => {
         //manually rollback - fix once ember-data has a way to rollback relationships
         get(user, 'favoriteReports')[rollbackOperation](report);
-        get(this, 'naviNotifications').add({
-          message: 'OOPS! An error occurred while updating favorite reports',
-          type: 'danger',
-          timeout: 'medium'
+        this.naviNotifications.add({
+          title: 'An error occurred while updating favorite reports',
+          style: 'danger',
+          timeout: 'medium',
         });
       });
     },
 
     openFilters() {
       set(this.controller, 'isFiltersCollapsed', false);
-    }
-  }
+    },
+  },
 });

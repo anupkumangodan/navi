@@ -1,4 +1,4 @@
-{{!-- Copyright 2020, Yahoo Holdings Inc. Licensed under the terms of the MIT license. See accompanying LICENSE.md file for terms. --}}
+{{!-- Copyright 2021, Yahoo Holdings Inc. Licensed under the terms of the MIT license. See accompanying LICENSE.md file for terms. --}}
 <div class="navi-column-config-base" ...attributes>
   <div class="navi-column-config-base__body">
   <div class="navi-column-config-base__option navi-column-config-base-type">
@@ -17,18 +17,21 @@
       </span>
     </div>
   </div>
-
-    <div class="navi-column-config-base__option navi-column-config-base__column-name">
-      <label for="{{this.classId}}-column-name-input" class="navi-column-config-base__column-name-label navi-column-config-base__option-label">Column Name</label>
-      <Input
-        class="navi-column-config-base__column-name-input navi-column-config-base__option-input"
-        id="{{this.classId}}-column-name-input"
-        @value={{readonly @column.fragment.alias}}
-        @placeholder={{@column.fragment.displayName}}
-        @key-up={{fn @onRenameColumn}}
+  <div class="navi-column-config-base__option navi-column-config-base__column-name">
+    <DenaliInputGroup
+      @label="Column Name"
+      @isStacked= {{true}}
+    >
+      <DenaliInput
+        @size="medium"
+        type="text"
+        @wrapperClass="navi-column-config-base__denali"
+        value={{@column.fragment.alias}}
+        placeholder={{@column.fragment.displayName}}
+        {{on "input" (pipe (pick "target.value") (fn @onRenameColumn))}}
       />
-    </div>
-
+    </DenaliInputGroup>
+  </div>
     {{#each @column.fragment.columnMetadata.parameters as |param|}}
       <div class="navi-column-config-base__option navi-column-config-item__parameter">
         <label for="{{this.classId}}-{{param.id}}" class="navi-column-config-item__parameter-label navi-column-config-base__option-label">{{capitalize param.name}} Type
@@ -42,6 +45,7 @@
         </label>
         {{#let (await param.values) as |paramValues|}}
           <PowerSelect
+            @searchEnabled={{true}}
             @triggerClass="navi-column-config-item__parameter-trigger navi-column-config-base__option-input"
             @triggerId="{{this.classId}}-{{param.id}}"
             @dropdownClass="navi-column-config-item__parameter-dropdown"
@@ -49,7 +53,7 @@
             @searchField={{if paramValues.firstObject.name "name" "description"}}
             @searchPlaceholder="Search {{capitalize param.name}}"
             @options={{paramValues}}
-            @onchange={{fn this.setParameter param}}
+            @onChange={{fn this.setParameter param}}
             as | arg |
           >
             <ParameterListItem @argument={{arg}} @parameters={{paramValues}} />

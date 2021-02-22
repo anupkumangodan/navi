@@ -4,7 +4,7 @@ module.exports = function(environment) {
   let ENV = {
     modulePrefix: 'navi-app',
     environment,
-    rootURL: '/ui',
+    rootURL: '/ui/',
     locationType: 'auto',
     EmberENV: {
       FEATURES: {
@@ -31,7 +31,8 @@ module.exports = function(environment) {
       FEATURES: {
         enableDashboardFilters: true,
         exportFileTypes: [],
-        enableTableEditing: true
+        enableTableEditing: true,
+        enableTotals: true
       }
     },
     apollo: {}

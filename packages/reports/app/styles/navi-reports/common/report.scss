@@ -1,0 +1,123 @@
+/**
+ * Copyright 2021, Yahoo Holdings Inc.
+ * Licensed under the terms of the MIT license. See accompanying LICENSE.md file for terms.
+ */
+
+@mixin navi-report-style {
+  display: flex;
+  flex: 1;
+  flex-flow: column;
+  max-width: 100%;
+  min-height: 0;
+  margin-top: 10px;
+
+  &__breadcrumb {
+    margin: 5px 0 0 0;
+
+    &-link {
+      color: $color-brand-300;
+    }
+  }
+
+  &__title {
+    color: $color-grey-800;
+    display: flex;
+    font-size: $h1-font-size;
+    text-transform: capitalize;
+  }
+
+  &__breadcrumb,
+  &__header {
+    padding: 0 20px 0 25px;
+  }
+
+  &__header {
+    align-items: center;
+    background-color: $color-grey-100;
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 10px;
+    min-height: min-content;
+  }
+
+  &-invalid__highlight-text {
+    color: $color-status-danger;
+  }
+
+  &-invalid__info-message,
+  &-new__info-message {
+    margin: 10px;
+  }
+
+  &-invalid__unauthorized-body {
+    text-align: center;
+  }
+
+  &__actions {
+    margin-right: 10px;
+  }
+
+  &__action {
+    display: inline-block;
+  }
+
+  &__action-icon {
+    margin-right: 6px;
+  }
+
+  &__action-link--is-disabled,
+  &__action--is-disabled button {
+    color: $color-grey-600;
+    cursor: not-allowed;
+  }
+
+  // TODO :: Investigate why this style could not be consolidated with
+  // &__action-link--is-disabled
+  &__action-link--force-disabled {
+    color: $color-grey-600 !important;
+    cursor: not-allowed !important;
+  }
+
+  &__icon {
+    padding: 4px;
+  }
+
+  &__body {
+    display: flex;
+    flex: 1;
+    flex-flow: column;
+    min-height: min-content;
+  }
+
+  &__footer {
+    padding: 0 15px 0px 20px;
+    margin: 10px 0;
+    min-height: min-content;
+
+    button {
+      margin: 0 5px;
+    }
+
+    @include media-size-only(mobile) {
+      flex-flow: wrap-reverse;
+      padding-bottom: 10px;
+
+      button {
+        margin: 5px 0;
+      }
+    }
+  }
+
+  &__fav-icon {
+    font-size: 18px;
+    margin: 12px 10px 0 10px;
+  }
+
+  &__report-action {
+    margin-top: 0;
+  }
+}
+
+.navi-report {
+  @include navi-report-style;
+}

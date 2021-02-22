@@ -1,6 +1,6 @@
 import { module, test } from 'qunit';
 import { setupRenderingTest } from 'ember-qunit';
-import { render } from '@ember/test-helpers';
+import { click, render } from '@ember/test-helpers';
 import hbs from 'htmlbars-inline-precompile';
 import { TestContext } from 'ember-test-helpers';
 import BaseVisualizationManifest from 'navi-core/navi-visualization-manifests/base';
@@ -67,13 +67,11 @@ module('Integration | Component | visualization config/line chart', function(hoo
   });
 
   test('showStackOption', async function(assert) {
-    assert.expect(5);
+    assert.expect(6);
 
     await render(Template);
 
-    assert
-      .dom('.line-chart-config .line-chart-config__stacked-opt')
-      .isVisible('The `stacked` option is correctly rendered based on request');
+    assert.dom('.denali-switch').isVisible('The `stacked` option is correctly rendered based on request');
 
     assert
       .dom('.line-chart-config .line-chart-config__series-config')
@@ -85,6 +83,9 @@ module('Integration | Component | visualization config/line chart', function(hoo
       .dom('.line-chart-config .line-chart-config__series-config')
       .isVisible('The series config component is rendered when `stacked` option is on');
 
+    await click('.line-chart-config__stacked-opt-select');
+    assert.dom('.line-chart-config__stacked-opt-select').isNotChecked('Stacked toggle is checked');
+
     this.set('request', {
       hasGroupBy: false,
       hasMultipleMetrics: false,
@@ -94,7 +95,7 @@ module('Integration | Component | visualization config/line chart', function(hoo
     await render(Template);
 
     assert
-      .dom('.line-chart-config .line-chart-config__stacked-opt')
+      .dom('.line-chart-config .line-chart-config__stacked-opt-select')
       .isNotVisible('The `stacked` option is correctly hidden based on request');
 
     assert

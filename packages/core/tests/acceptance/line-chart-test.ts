@@ -24,7 +24,7 @@ module('Acceptance | line chart', function(hooks) {
     assert.dom('.chart-tooltip__sub-title').hasText('Ad Clicks', "The tooltip contains the metric's display name.");
 
     // Select a different metric
-    await selectChoose('.navi-visualization-config .metric-select__select__selector', 'Revenue (USD)');
+    await selectChoose('.metric-select__select-trigger', 'Revenue (USD)');
 
     // check text of the tooltip container
     await showTooltip();
@@ -53,20 +53,24 @@ module('Acceptance | line chart', function(hooks) {
 
     let linePath = find('svg .c3-chart-line.chart-series-0 .c3-lines path')?.getAttribute('d');
 
-    await selectChoose('.line-chart-config__curve-opt', 'Spline');
+    await selectChoose('.line-chart-config__curve-opt-select', 'Spline');
 
     let linePathSpline = find('svg .c3-chart-line.chart-series-0 .c3-lines path')?.getAttribute('d');
     let lineAreaSpline = find('svg .c3-chart-line.chart-series-0 .c3-areas path')?.getAttribute('d');
 
     assert.notEqual(linePath, linePathSpline, 'Chart updated with new values');
 
-    await click('.line-chart-config__area-opt .x-toggle-btn');
+    await click('.line-chart-config__area-opt-select');
+    assert.dom('.line-chart-config__area-opt-select').isChecked('Area is on');
 
     let linePathSplineArea = find('svg .c3-chart-line.chart-series-0 .c3-lines path')?.getAttribute('d');
     let lineAreaSplineArea = find('svg .c3-chart-line.chart-series-0 .c3-areas path')?.getAttribute('d');
 
     assert.notEqual(linePathSpline, linePathSplineArea, 'lines have been updated');
     assert.notEqual(lineAreaSpline, lineAreaSplineArea, 'Area is updated');
+
+    await click('.line-chart-config__area-opt-select');
+    assert.dom('.line-chart-config__area-opt-select').isNotChecked('Area is off');
   });
 
   test('series reorder - metric', async function(assert) {
@@ -75,14 +79,11 @@ module('Acceptance | line chart', function(hooks) {
     await visit('/line-chart');
 
     // switch on `stacked` and expand the config
-    await click('.chart-container.metric .line-chart-config__stacked-opt .x-toggle-btn');
-    await click('.line-chart-config__series-config__header');
+    await click('.chart-container.metric .line-chart-config__stacked-opt-select');
 
     const beforeOrder = ['Unique Identifiers', 'Total Page Views', 'Revenue (USD)'];
     assert.deepEqual(
-      findAll('.chart-container.metric .line-chart-config__series-config__item__content').map(el =>
-        el.textContent?.trim()
-      ),
+      findAll('.line-chart-config__series-config__item__content').map(el => el.textContent?.trim()),
       beforeOrder,
       'The headers are ordered in their initial order'
     );
@@ -120,8 +121,7 @@ module('Acceptance | line chart', function(hooks) {
     await visit('/line-chart');
 
     // switch on `stacked` and expand the config
-    await click('.chart-container.dimension .line-chart-config__stacked-opt .x-toggle-btn');
-    await click('.chart-container.dimension .line-chart-config__series-config__header');
+    await click('.chart-container.dimension .line-chart-config__stacked-opt-select');
 
     const beforeOrder = ['-3,All Other', '4,21-24', '5,25-29'];
     assert.deepEqual(

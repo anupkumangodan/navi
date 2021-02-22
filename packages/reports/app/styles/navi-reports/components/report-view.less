@@ -1,5 +1,5 @@
 /**
- * Copyright 2018, Yahoo Holdings Inc.
+ * Copyright 2021, Yahoo Holdings Inc.
  * Licensed under the terms of the MIT license. See accompanying LICENSE.md file for terms.
  */
 
@@ -31,6 +31,7 @@
     flex: 1;
     flex-basis: 0;
     min-height: 0;
+    min-height: 300px;
   }
 
   &__navi-visualization-config {
@@ -39,8 +40,8 @@
   }
 
   &__visualization-edit {
-    background-color: @navi-modal-gray;
-    border-left: 1px solid @navi-lighter-gray;
+    background-color: @denali-grey-100;
+    border-left: 2px solid #e8e8e8;
     display: flex;
     flex: 1;
     flex-flow: column;
@@ -52,13 +53,23 @@
     overflow: hidden;
   }
 
-  &__visualization-edit-btn {
+  &__visualization-edit-header {
+    align-items: center;
+    display: flex;
     font-size: @font-size-base;
-    text-align: right;
+    font-weight: bold;
+    justify-content: space-between;
+    padding: 10px 20px;
   }
 
-  &__visualization-edit-header {
-    margin: 14px 11px;
+  &__visualization-edit-close {
+    color: @denali-grey-800; //TODO make themable var
+    opacity: 0.4;
+    line-height: 14px;
+    &:hover {
+      color: @denali-grey-800;
+      opacity: 0.6;
+    }
   }
 
   &__visualization-header {

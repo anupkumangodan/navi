@@ -1,13 +1,12 @@
 import { module, test } from 'qunit';
 import { setupTest } from 'ember-qunit';
-import { run } from '@ember/runloop';
 
 let Payload, Model, Keg, TableFactory;
 
-module('Unit | Metadata Model | Table', function(hooks) {
+module('Unit | Metadata Model | Table', function (hooks) {
   setupTest(hooks);
 
-  hooks.beforeEach(function() {
+  hooks.beforeEach(function () {
     Payload = {
       id: 'tableA',
       name: 'Table A',
@@ -17,12 +16,12 @@ module('Unit | Metadata Model | Table', function(hooks) {
       metricIds: ['pv'],
       dimensionIds: ['age'],
       timeDimensionIds: ['orderDate'],
-      timeGrainIds: ['day', 'month', 'week'],
+      isFact: true,
       source: 'bardOne',
-      tags: ['DISPLAY']
+      tags: ['DISPLAY'],
     };
 
-    Model = run(() => this.owner.factoryFor('model:metadata/table').create(Payload));
+    Model = this.owner.factoryFor('model:metadata/table').create(Payload);
 
     //Looking up and injecting keg into the model
     Keg = this.owner.lookup('service:keg');
@@ -34,7 +33,7 @@ module('Unit | Metadata Model | Table', function(hooks) {
         name: 'Page Views',
         description: 'Page Views',
         category: 'Page Views',
-        source: 'bardOne'
+        source: 'bardOne',
       },
       { namespace: 'bardOne' }
     );
@@ -45,7 +44,7 @@ module('Unit | Metadata Model | Table', function(hooks) {
         name: 'Age',
         description: 'Age',
         category: 'category',
-        source: 'bardOne'
+        source: 'bardOne',
       },
       { namespace: 'bardOne' }
     );
@@ -56,7 +55,7 @@ module('Unit | Metadata Model | Table', function(hooks) {
         name: 'Order Date',
         description: 'Order Date',
         category: 'category',
-        source: 'bardOne'
+        source: 'bardOne',
       },
       { namespace: 'bardOne' }
     );
@@ -64,13 +63,13 @@ module('Unit | Metadata Model | Table', function(hooks) {
     TableFactory = this.owner.factoryFor('model:metadata/table').class;
   });
 
-  test('factory has identifierField defined', function(assert) {
+  test('factory has identifierField defined', function (assert) {
     assert.expect(1);
 
     assert.equal(TableFactory.identifierField, 'id', 'identifierField property is set to `id`');
   });
 
-  test('it properly hydrates properties', function(assert) {
+  test('it properly hydrates properties', function (assert) {
     assert.expect(11);
 
     const {
@@ -83,8 +82,8 @@ module('Unit | Metadata Model | Table', function(hooks) {
       dimensionIds,
       timeDimensionIds,
       source,
-      timeGrainIds,
-      tags
+      isFact,
+      tags,
     } = Model;
 
     assert.equal(id, Payload.id, 'id property is hydrated properly');
@@ -97,10 +96,10 @@ module('Unit | Metadata Model | Table', function(hooks) {
     assert.deepEqual(timeDimensionIds, Payload.timeDimensionIds, 'timeDimensionIds property is hydrated properly');
     assert.equal(source, Payload.source, 'source property is hydrated properly');
     assert.deepEqual(tags, Payload.tags, 'tags property is hydrated properly');
-    assert.deepEqual(timeGrainIds, Payload.timeGrainIds, 'timeGrainIds property is hydrated properly');
+    assert.deepEqual(isFact, Payload.isFact, 'isFact property is hydrated properly');
   });
 
-  test('Metric in Table', function(assert) {
+  test('Metric in Table', function (assert) {
     assert.expect(1);
     assert.equal(
       Model.metrics[0],
@@ -109,7 +108,7 @@ module('Unit | Metadata Model | Table', function(hooks) {
     );
   });
 
-  test('Dimension in Table', function(assert) {
+  test('Dimension in Table', function (assert) {
     assert.expect(1);
 
     assert.equal(
@@ -119,7 +118,7 @@ module('Unit | Metadata Model | Table', function(hooks) {
     );
   });
 
-  test('Time Dimension in Table', function(assert) {
+  test('Time Dimension in Table', function (assert) {
     assert.expect(1);
 
     assert.equal(

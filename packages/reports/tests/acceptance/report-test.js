@@ -24,12 +24,12 @@ const PersistedIdRegex = /\/\d+\/view$/;
 
 let CompressionService;
 
-module('Acceptance | Navi Report', function(hooks) {
+module('Acceptance | Navi Report', function (hooks) {
   setupApplicationTest(hooks);
   setupAnimationTest(hooks);
   setupMirage(hooks);
 
-  hooks.beforeEach(function() {
+  hooks.beforeEach(function () {
     CompressionService = this.owner.lookup('service:compression');
     // Mocking add-to-dashboard component
     this.owner.application.register(
@@ -41,11 +41,11 @@ module('Acceptance | Navi Report', function(hooks) {
     config.navi.FEATURES.enableVerticalCollectionTableIterator = true;
   });
 
-  hooks.afterEach(function() {
+  hooks.afterEach(function () {
     config.navi.FEATURES.enableVerticalCollectionTableIterator = false;
   });
 
-  test('validation errors', async function(assert) {
+  test('validation errors', async function (assert) {
     assert.expect(3);
 
     // Make an invalid change and run report
@@ -57,7 +57,7 @@ module('Acceptance | Navi Report', function(hooks) {
 
     assert.equal(currentURL(), '/reports/13/invalid', 'User is transitioned to invalid route');
 
-    let errors = findAll('.navi-info-message__error-list-item').map(el => find(el).innerText.trim());
+    let errors = findAll('.navi-info-message__error-list-item').map((el) => find(el).innerText.trim());
     assert.deepEqual(errors, ['At least one column should be selected'], 'Form errors are displayed to user');
 
     await clickItem('dimension', 'Date Time');
@@ -68,7 +68,7 @@ module('Acceptance | Navi Report', function(hooks) {
     assert.equal(currentURL(), '/reports/13/view', 'Fixing errors and clicking "Run" returns user to view route');
   });
 
-  test('Clone report', async function(assert) {
+  test('Clone report', async function (assert) {
     assert.expect(2);
 
     await visit('/reports/1/clone');
@@ -78,7 +78,7 @@ module('Acceptance | Navi Report', function(hooks) {
     assert.equal(find('.navi-report__title').innerText.trim(), 'Copy Of Hyrule News', 'Cloned report is being viewed');
   });
 
-  test('Clone invalid report', async function(assert) {
+  test('Clone invalid report', async function (assert) {
     assert.expect(2);
 
     await visit('/reports/13');
@@ -96,7 +96,7 @@ module('Acceptance | Navi Report', function(hooks) {
     assert.notOk(currentURL().startsWith('/reports/13'), 'After clicking, the url no longer is on report 13');
   });
 
-  test('New report', async function(assert) {
+  test('New report', async function (assert) {
     assert.expect(4);
     let originalFlag = config.navi.FEATURES.exportFileTypes;
     config.navi.FEATURES.exportFileTypes = ['csv', 'png'];
@@ -119,9 +119,9 @@ module('Acceptance | Navi Report', function(hooks) {
     await selectChoose('.navi-column-config-item__parameter-trigger', 'Day');
     await clickItemFilter('dimension', 'Operating System');
     await clickItem('metric', 'Ad Clicks');
-    await selectChoose('.filter-builder__select-trigger', 'Between');
+    await selectChoose('.filter-builder__operator-trigger', 'Between');
 
-    await clickTrigger('.filter-values--date-range-input__low-value .ember-basic-dropdown-trigger');
+    await clickTrigger('.filter-values--date-range-input__low-value');
 
     await click($('button.ember-power-calendar-day--current-month:contains(4)')[0]);
     await clickTrigger('.filter-values--date-range-input__high-value .ember-basic-dropdown-trigger');
@@ -133,14 +133,15 @@ module('Acceptance | Navi Report', function(hooks) {
     assert.ok(!!findAll('.table-widget').length, 'Data table visualization is shown by default');
 
     assert.ok(
-      !!findAll('.table-header-row-vc--view .table-header-cell').filter(el => el.innerText.includes('Ad Clicks'))
+      !!findAll('.table-header-row-vc--view .table-header-cell').filter((el) => el.innerText.includes('Ad Clicks'))
         .length,
       'Ad Clicks column is displayed'
     );
+
     config.navi.FEATURES.exportFileTypes = originalFlag;
   });
 
-  test('New report - copy api', async function(assert) {
+  test('New report - copy api', async function (assert) {
     assert.expect(3);
 
     await visit('/reports/new');
@@ -151,32 +152,32 @@ module('Acceptance | Navi Report', function(hooks) {
     await clickItemFilter('dimension', 'Date Time');
 
     //set the filter interval
-    await selectChoose('.filter-builder__select-trigger', 'Between');
-    await clickTrigger('.filter-values--date-range-input__low-value .ember-basic-dropdown-trigger');
+    await selectChoose('.filter-builder__operator-trigger', 'Between');
+    await clickTrigger('.filter-values--date-range-input__low-value');
     await click($('button.ember-power-calendar-day--current-month:contains(5)')[0]);
-    await clickTrigger('.filter-values--date-range-input__high-value .ember-basic-dropdown-trigger');
+    await clickTrigger('.filter-values--date-range-input__high-value');
     await click($('button.ember-power-calendar-day--current-month:contains(10)')[0]);
 
-    await click('.navi-report__copy-api-btn .get-api__btn');
+    await click('.get-api__action-btn');
 
-    assert.dom('.get-api-modal-container').isVisible('Copy modal is open after fixing error clicking button');
+    assert.dom('.get-api__modal').isVisible('Copy modal is open after fixing error clicking button');
 
     /* == Add some more metrics and check that copy modal updates == */
-    await click('.navi-modal__close');
+    await click('.d-close');
     await clickItem('metric', 'Additive Page Views');
-    await click('.navi-report__copy-api-btn .get-api__btn');
+    await click('.get-api__action-btn');
 
     assert.ok(
-      find('.navi-modal__input').value.includes('metrics=adClicks%2CaddPageViews'),
+      find('.get-api__api-input').value.includes('metrics=adClicks%2CaddPageViews'),
       'API query updates with request'
     );
 
     assert
-      .dom('.get-api-modal-container input')
+      .dom('.get-api__api-input')
       .hasValue(/^https:\/\/data.naviapp.io\/\S+$/, 'shows api url from right datasource');
   });
 
-  test('Revert changes when exiting report - existing report', async function(assert) {
+  test('Revert changes when exiting report - existing report', async function (assert) {
     // visit report 1
     await visit('/reports/1/view');
 
@@ -195,7 +196,7 @@ module('Acceptance | Navi Report', function(hooks) {
     assert.dom('.filter-builder__subject').hasText('Date Time (day)');
   });
 
-  test('Revert changes - existing report', async function(assert) {
+  test('Revert changes - existing report', async function (assert) {
     assert.expect(4);
 
     await visit('/reports/13/view');
@@ -220,7 +221,7 @@ module('Acceptance | Navi Report', function(hooks) {
     assert.dom('.navi-report__revert-btn').isNotVisible('After clicking "Revert Changes", button is once again hidden');
   });
 
-  test('Revert changes - new report', async function(assert) {
+  test('Revert changes - new report', async function (assert) {
     assert.expect(2);
 
     await visit('/reports/new');
@@ -234,7 +235,7 @@ module('Acceptance | Navi Report', function(hooks) {
       .isNotVisible('Revert changes button is not visible on a new report even after making a change');
   });
 
-  test('Revert and Save report', async function(assert) {
+  test('Revert and Save report', async function (assert) {
     assert.expect(4);
 
     await visit('/reports');
@@ -243,13 +244,13 @@ module('Acceptance | Navi Report', function(hooks) {
     await clickItemFilter('dimension', 'Date Time');
     await clickItem('dimension', 'Date Time');
     await selectChoose('.navi-column-config-item__parameter-trigger', 'Day');
-    await selectChoose('.filter-builder__select-trigger', 'Between');
+    await selectChoose('.filter-builder__operator-trigger', 'Between');
 
     //Add metric and save the report
     await clickItem('metric', 'Page Views');
     await click('.navi-report__save-btn');
 
-    server.patch('/reports/:id', function({ reports }, request) {
+    server.patch('/reports/:id', function ({ reports }, request) {
       assert.equal(
         request.requestHeaders['Content-Type'],
         'application/vnd.api+json',
@@ -293,7 +294,7 @@ module('Acceptance | Navi Report', function(hooks) {
       .isNotVisible('Error message is not displayed when reverting and running');
   });
 
-  test('Cancel Save As report', async function(assert) {
+  test('Cancel Save As report', async function (assert) {
     assert.expect(6);
 
     await visit('/reports');
@@ -302,7 +303,7 @@ module('Acceptance | Navi Report', function(hooks) {
     //Add a metrics and save the report
     await clickItem('dimension', 'Date Time');
     await clickItemFilter('dimension', 'Date Time');
-    await selectChoose('.filter-builder__select-trigger', 'Between');
+    await selectChoose('.filter-builder__operator-trigger', 'Between');
     await clickItem('metric', 'Additive Page Views');
     await click('.navi-report__save-btn');
 
@@ -312,12 +313,11 @@ module('Acceptance | Navi Report', function(hooks) {
 
     // And click Save AS the report
     await click('.navi-report__save-as-btn');
-
     // The Modal with buttons is Visible
-    assert.dom('.save-as__cancel-modal-btn').isVisible('Save As Modal is visible with cancel key');
+    assert.dom('.save-as__cancel-btn').isVisible('Save As Modal is visible with cancel key');
 
     // Press the Modal X button
-    await click('.navi-modal__close');
+    await click('.save-as__cancel-btn');
 
     // Changes were not reverted, but they were not saved
     assert.ok(
@@ -337,10 +337,10 @@ module('Acceptance | Navi Report', function(hooks) {
     await click('.navi-report__save-as-btn');
 
     // The Modal with buttons is Visible
-    assert.dom('.save-as__cancel-modal-btn').isVisible('Save As Modal is visible with cancel key');
+    assert.dom('.save-as__cancel-btn').isVisible('Save As Modal is visible with cancel key');
 
     // Press the Modal cancel button
-    await click('.save-as__cancel-modal-btn');
+    await click('.save-as__cancel-btn');
 
     // Changes were not reverted, but they were not saved
     assert.ok(
@@ -355,7 +355,7 @@ module('Acceptance | Navi Report', function(hooks) {
     );
   });
 
-  test('Save As report', async function(assert) {
+  test('Save As report', async function (assert) {
     assert.expect(6);
 
     await visit('/reports/13');
@@ -370,10 +370,10 @@ module('Acceptance | Navi Report', function(hooks) {
 
     // The Modal with buttons is Visible
 
-    assert.dom('.save-as__save-as-modal-btn').isVisible('Save As Modal is visible with save as key');
+    assert.dom('.save-as__save-as-btn').isVisible('Save As Modal is visible with save as key');
 
     // Press the save as
-    await click('.save-as__save-as-modal-btn');
+    await click('.save-as__save-as-btn');
 
     assert.ok(!!$('.filter-builder__subject:contains(isoWeek)').length, 'The new Dim is shown in the new report.');
 
@@ -399,7 +399,7 @@ module('Acceptance | Navi Report', function(hooks) {
       .hasText('RequestV2 testing report', 'Old Report with unchanged title is being viewed.');
   });
 
-  test('Save As change title manually', async function(assert) {
+  test('Save As change title manually', async function (assert) {
     assert.expect(6);
     await visit('/reports/13');
     // Change the Dim
@@ -411,13 +411,13 @@ module('Acceptance | Navi Report', function(hooks) {
     await click('.navi-report__save-as-btn');
 
     // The Modal with buttons is Visible
-    assert.dom('.save-as__save-as-modal-btn').isVisible('Save As Modal is visible with save as key');
+    assert.dom('.save-as__save-as-btn').isVisible('Save As Modal is visible with save as key');
 
     //fill in new title
-    await fillIn('.navi-modal .text-input.dashboard-title', 'Title of Hyrule');
+    await fillIn('.save-as__report-name', 'Title of Hyrule');
 
     // Press the save as
-    await click('.save-as__save-as-modal-btn');
+    await click('.save-as__save-as-btn');
 
     assert.ok(!!$('.filter-builder__subject:contains(month)').length, 'The new Dim is shown in the new report.');
 
@@ -441,7 +441,7 @@ module('Acceptance | Navi Report', function(hooks) {
       .hasText('RequestV2 testing report', 'Old Report with unchanged title is being viewed.');
   });
 
-  test('Save As on failure', async function(assert) {
+  test('Save As on failure', async function (assert) {
     assert.expect(3);
 
     server.urlPrefix = `${config.navi.appPersistence.uri}`;
@@ -457,7 +457,7 @@ module('Acceptance | Navi Report', function(hooks) {
     await click('.navi-report__save-as-btn');
 
     // Press the save as
-    await click('.save-as__save-as-modal-btn');
+    await click('.save-as__save-as-btn');
 
     // An error will occur and it will go back to old report dirty state
 
@@ -473,7 +473,7 @@ module('Acceptance | Navi Report', function(hooks) {
     assert.ok(!!$('.filter-builder__subject:contains(isoWeek)').length, 'Old unsaved report have the old DIM.');
   });
 
-  test('Save report', async function(assert) {
+  test('Save report', async function (assert) {
     assert.expect(4);
 
     await visit('/reports');
@@ -498,7 +498,7 @@ module('Acceptance | Navi Report', function(hooks) {
       .isNotVisible('Save button is not visible when report is saved and has no changes');
   });
 
-  test('Clone action', async function(assert) {
+  test('Clone action', async function (assert) {
     assert.expect(2);
 
     await visit('/reports/1/view');
@@ -512,7 +512,7 @@ module('Acceptance | Navi Report', function(hooks) {
     assert.dom('.navi-report__title').hasText('Copy of Hyrule News', 'Cloned report is being viewed');
   });
 
-  test('Clone action - enabled/disabled', async function(assert) {
+  test('Clone action - enabled/disabled', async function (assert) {
     assert.expect(2);
 
     await visit('/reports/1/view');
@@ -530,7 +530,7 @@ module('Acceptance | Navi Report', function(hooks) {
       .hasNoClass('navi-report__action-link--force-disabled', 'Clone action is enabled from a valid save report');
   });
 
-  test('Export feature flag - disabled', async function(assert) {
+  test('Export feature flag - disabled', async function (assert) {
     assert.expect(1);
 
     let originalFlag = config.navi.FEATURES.exportFileTypes;
@@ -538,15 +538,15 @@ module('Acceptance | Navi Report', function(hooks) {
     await visit('/reports/1/view');
 
     assert.deepEqual(
-      findAll('.navi-report__action').map(e => e.textContent.trim()),
-      ['Copy API Query', 'Clone', 'Share', 'Schedule', 'Delete'],
+      findAll('.navi-report__action').map((e) => e.textContent.trim()),
+      ['API Query', 'Clone', 'Share', 'Schedule', 'Delete'],
       'Export is disabled by default'
     );
 
     config.navi.FEATURES.exportFileTypes = originalFlag;
   });
 
-  test('Export feature flag - enabled', async function(assert) {
+  test('Export feature flag - enabled', async function (assert) {
     assert.expect(1);
 
     let originalFlag = config.navi.FEATURES.exportFileTypes;
@@ -555,15 +555,15 @@ module('Acceptance | Navi Report', function(hooks) {
     await visit('/reports/1/view');
 
     assert.deepEqual(
-      findAll('.navi-report__action').map(e => e.textContent.trim()),
-      ['Copy API Query', 'Clone', 'Export', 'Share', 'Schedule', 'Delete'],
+      findAll('.navi-report__action').map((e) => e.textContent.trim()),
+      ['API Query', 'Clone', 'Export', 'Share', 'Schedule', 'Delete'],
       'Export is enabled with the feature flag on'
     );
 
     config.navi.FEATURES.exportFileTypes = originalFlag;
   });
 
-  test('Export action - enabled/disabled', async function(assert) {
+  test('Export action - enabled/disabled', async function (assert) {
     assert.expect(4);
 
     let originalFlag = config.navi.FEATURES.exportFileTypes;
@@ -581,26 +581,26 @@ module('Acceptance | Navi Report', function(hooks) {
     //currently failing as it should
     assert
       .dom($('.navi-report__action-link:contains(Export)')[0])
-      .hasClass('navi-report__action-link--force-disabled', 'Export action is disabled when report is not valid');
+      .hasClass('is-disabled', 'Export action is disabled when report is not valid');
 
     // Revert changes to make it in sync with the visualization
     await click('.navi-report__revert-btn');
 
     assert
       .dom($('.navi-report__action-link:contains(Export)')[0])
-      .hasNoClass('navi-report__action-link--force-disabled', 'Export action is enabled for a valid report');
+      .hasNoClass('is-disabled', 'Export action is enabled for a valid report');
 
     // Remove visualization metric to create an invalid report
     await click('.navi-column-config-item__remove-icon[aria-label="delete metric Ad Clicks"]');
 
     assert
       .dom($('.navi-report__action-link:contains(Export)')[0])
-      .hasClass('navi-report__action-link--force-disabled', 'Export action is disabled when report is not valid');
+      .hasClass('is-disabled', 'Export action is disabled when report is not valid');
 
     config.navi.FEATURES.exportFileTypes = originalFlag;
   });
 
-  test('Export action - href', async function(assert) {
+  test('Export action - href', async function (assert) {
     assert.expect(4);
 
     let originalFeatureFlag = config.navi.FEATURES.exportFileTypes;
@@ -610,9 +610,7 @@ module('Acceptance | Navi Report', function(hooks) {
     await visit('/reports/1/view');
 
     assert.ok(
-      $('.navi-report__action-link:contains(Export)')
-        .attr('href')
-        .includes('/network/day/property;show=id/?dateTime='),
+      $('.navi-report__action-link:contains(Export)').attr('href').includes('/network/day/property;show=id/?dateTime='),
       'Export url contains dimension path param'
     );
 
@@ -628,9 +626,7 @@ module('Acceptance | Navi Report', function(hooks) {
     );
 
     assert.notOk(
-      $('.navi-report__action-link:contains(Export)')
-        .attr('href')
-        .includes('filter'),
+      $('.navi-report__action-link:contains(Export)').attr('href').includes('filter'),
       'No filters are initially present in export url'
     );
 
@@ -652,7 +648,7 @@ module('Acceptance | Navi Report', function(hooks) {
     config.navi.FEATURES.exportFileTypes = originalFeatureFlag;
   });
 
-  test('Multi export action - csv href', async function(assert) {
+  test('Multi export action - csv href', async function (assert) {
     assert.expect(5);
 
     let originalFlag = config.navi.FEATURES.exportFileTypes;
@@ -681,9 +677,7 @@ module('Acceptance | Navi Report', function(hooks) {
     );
 
     assert.notOk(
-      $('.multiple-format-export__dropdown a:contains(CSV)')
-        .attr('href')
-        .includes('filter'),
+      $('.multiple-format-export__dropdown a:contains(CSV)').attr('href').includes('filter'),
       'No filters are initially present in export url'
     );
 
@@ -702,13 +696,13 @@ module('Acceptance | Navi Report', function(hooks) {
     );
 
     assert
-      .dom(findAll('.multiple-format-export__dropdown a').filter(el => el.textContent.trim() === 'CSV')[0])
+      .dom(findAll('.multiple-format-export__dropdown a').filter((el) => el.textContent.trim() === 'CSV')[0])
       .hasAttribute('href', /^https:\/\/data.naviapp.io\/\S+$/, 'uses csv export from right datasource');
 
     config.navi.FEATURES.exportFileTypes = originalFlag;
   });
 
-  test('Multi export action - pdf and png href', async function(assert) {
+  test('Multi export action - pdf and png href', async function (assert) {
     assert.expect(5);
 
     let originalExportFlag = config.navi.FEATURES.exportFileTypes;
@@ -743,11 +737,9 @@ module('Acceptance | Navi Report', function(hooks) {
     encodedModel = $('.multiple-format-export__dropdown a:contains("PDF")')
       .attr('href')
       .split('/export?reportModel=')[1];
-    await CompressionService.decompressModel(encodedModel).then(model => {
+    await CompressionService.decompressModel(encodedModel).then((model) => {
       assert.equal(
-        get(model, 'request.columns')
-          .objectAt(4)
-          .get('displayName'),
+        get(model, 'request.columns').objectAt(4).get('displayName'),
         'Product Family (id)',
         'Groupby changes are automatically included in export url'
       );
@@ -761,7 +753,7 @@ module('Acceptance | Navi Report', function(hooks) {
     encodedModel = $('.multiple-format-export__dropdown a:contains("PDF")')
       .attr('href')
       .split('/export?reportModel=')[1];
-    await CompressionService.decompressModel(encodedModel).then(model => {
+    await CompressionService.decompressModel(encodedModel).then((model) => {
       assert.equal(
         get(model, 'visualization.type'),
         'table',
@@ -772,7 +764,7 @@ module('Acceptance | Navi Report', function(hooks) {
     /* == Add grand total to table == */
     await click('.report-view__visualization-edit-btn');
     await animationsSettled();
-    await click('.table-config__total-toggle-button--grand-total .x-toggle-btn');
+    await click('.table-config__total-toggle-button--grand-total');
     await click('.navi-report__run-btn');
     await clickTrigger('.multiple-format-export');
 
@@ -780,7 +772,7 @@ module('Acceptance | Navi Report', function(hooks) {
       .attr('href')
       .replace('&fileType=png', '')
       .split('/export?reportModel=')[1];
-    await CompressionService.decompressModel(encodedModel).then(model => {
+    await CompressionService.decompressModel(encodedModel).then((model) => {
       assert.equal(
         get(model, 'visualization.metadata.showTotals.grandTotal'),
         true,
@@ -792,36 +784,23 @@ module('Acceptance | Navi Report', function(hooks) {
     config.navi.FEATURES.enableTotals = originalTotalsFlag;
   });
 
-  test('Get API action - enabled/disabled', async function(assert) {
-    assert.expect(2);
-
+  test('Get API action - enabled/disabled', async function (assert) {
     await visit('/reports/13/view');
 
-    assert
-      .dom('.get-api')
-      .doesNotHaveClass('.navi-report__action--is-disabled', 'Get API action is enabled for a valid report');
+    assert.dom('.get-api__action-btn').isNotDisabled('Get API action is enabled for a valid report');
 
     // Remove all metrics
     await click('.navi-column-config-item__remove-icon[aria-label="delete metric Ad Clicks"]');
     await click('.navi-column-config-item__remove-icon[aria-label="delete dimension Property (id)"]');
     await click('.navi-column-config-item__remove-icon[aria-label="delete time-dimension Date Time (day)"]');
 
-    assert.ok(
-      [...find('.get-api').classList].includes('navi-report__action--is-disabled'),
-      'Get API action is disabled for an invalid report'
-    );
+    assert.dom('.get-api__action-btn').isDisabled('Get API action is disabled for an invalid report');
   });
 
-  test('Share report', async function(assert) {
-    assert.expect(3);
-
+  test('Share report', async function (assert) {
     /* == Saved report == */
     await visit('/reports/1/view');
     await click($('.navi-report__action:contains(Share) button')[0]);
-
-    assert
-      .dom('.navi-modal .primary-header')
-      .hasText('Share "Hyrule News"', 'Clicking share action brings up share modal');
 
     // Remove all metrics to create an invalid report
     await clickItem('metric', 'Ad Clicks');
@@ -839,38 +818,13 @@ module('Acceptance | Navi Report', function(hooks) {
       .hasNoClass('navi-report__action--is-disabled', 'Share action is disabled for new report');
   });
 
-  test('Share report notifications reset', async function(assert) {
-    assert.expect(4);
-
-    /* == Saved report == */
-    await visit('/reports/1/view');
-    await click($('.navi-report__action:contains(Share) button')[0]);
-
-    assert
-      .dom('.navi-modal .primary-header')
-      .hasText('Share "Hyrule News"', 'Clicking share action brings up share modal');
-
-    assert.dom('.navi-modal .modal-notification').isNotVisible('Notification banner is not shown');
-
-    await click('.navi-modal .copy-btn');
-
-    assert.dom('.navi-modal .modal-notification').isVisible('Notification banner is shown');
-
-    await click($('.navi-modal .btn:contains(Cancel)')[0]);
-    await click($('.navi-report__action:contains(Share) button')[0]);
-
-    assert
-      .dom('.navi-modal .modal-notification')
-      .isNotVisible('Notification banner is not shown after close and reopen');
-  });
-
-  test('Delete report on success', async function(assert) {
+  test('Delete report on success', async function (assert) {
     assert.expect(5);
 
     /* == Delete success == */
     await visit('/reports');
 
-    let reportNames = findAll('.table tbody td:first-child').map(el => el.innerText.trim());
+    let reportNames = findAll('.table tbody td:first-child').map((el) => el.innerText.trim());
 
     assert.deepEqual(
       reportNames,
@@ -879,15 +833,17 @@ module('Acceptance | Navi Report', function(hooks) {
     );
 
     await visit('/reports/1/view');
-    await click($('.navi-report__action:contains(Delete) button')[0]);
+    await click('.delete__action-btn');
 
-    assert.dom('.primary-header').hasText('Delete "Hyrule News"', 'Delete modal pops up when action is clicked');
+    assert
+      .dom('.delete__modal-details')
+      .hasText('This action cannot be undone. This will permanently delete the Hyrule News report.');
 
-    await click('.navi-modal .btn-primary');
+    await click('.delete__delete-btn');
 
     assert.ok(currentURL().endsWith('/reports'), 'After deleting, user is brought to report list view');
 
-    reportNames = findAll('.table tbody td:first-child').map(el => el.innerText.trim());
+    reportNames = findAll('.table tbody td:first-child').map((el) => el.innerText.trim());
 
     assert.deepEqual(reportNames, ['Hyrule Ad&Nav Clicks', 'Report 12'], 'Deleted report is removed from list');
 
@@ -900,7 +856,7 @@ module('Acceptance | Navi Report', function(hooks) {
     );
   });
 
-  test('Delete action - enabled at all times', async function(assert) {
+  test('Delete action - enabled at all times', async function (assert) {
     assert.expect(4);
 
     // Delete is not Disabled on new
@@ -931,23 +887,23 @@ module('Acceptance | Navi Report', function(hooks) {
     // Check Delete modal appear
     await click($('.navi-report__action:contains(Delete) button')[0]);
 
-    assert.dom('.primary-header').hasText('Delete "Hyrule News"', 'Delete modal pops up when action is clicked');
+    assert
+      .dom('.delete__modal-details')
+      .hasText('This action cannot be undone. This will permanently delete the Hyrule News report.');
   });
 
-  test('Delete report on failure', async function(assert) {
-    assert.expect(1);
-
+  test('Delete report on failure', async function (assert) {
     server.urlPrefix = `${config.navi.appPersistence.uri}`;
     server.delete('/reports/:id', () => new Response(500));
 
     await visit('/reports/2/view');
-    await click($('.navi-report__action:contains(Delete) button')[0]);
-    await click('.navi-modal .btn-primary');
+    await click('.delete__action-btn');
+    await click('.delete__delete-btn');
 
     assert.ok(currentURL().endsWith('reports/2/view'), 'User stays on current view when delete fails');
   });
 
-  test('Add to dashboard button - flag false', async function(assert) {
+  test('Add to dashboard button - flag false', async function (assert) {
     assert.expect(1);
 
     let originalFeatures = config.navi.FEATURES;
@@ -962,7 +918,7 @@ module('Acceptance | Navi Report', function(hooks) {
     config.navi.FEATURES = originalFeatures;
   });
 
-  test('Switch Visualization Type', async function(assert) {
+  test('Switch Visualization Type', async function (assert) {
     assert.expect(7);
 
     await visit('/reports/1/view');
@@ -986,7 +942,7 @@ module('Acceptance | Navi Report', function(hooks) {
     assert.dom('.report-view__visualization-edit-btn').hasText('Edit Line Chart', 'Edit Line Chart label is displayed');
   });
 
-  test('redirect from report/index route', async function(assert) {
+  test('redirect from report/index route', async function (assert) {
     assert.expect(2);
 
     await visit('/reports/1');
@@ -1002,12 +958,12 @@ module('Acceptance | Navi Report', function(hooks) {
       .isVisible('The report/index route redirects to the reports view route by default');
   });
 
-  test('visiting Reports Route', async function(assert) {
+  test('visiting Reports Route', async function (assert) {
     assert.expect(1);
 
     await visit('/reports');
 
-    let titles = findAll('.navi-collection .table tr td:first-of-type').map(el => find(el).innerText.trim());
+    let titles = findAll('.navi-collection .table tr td:first-of-type').map((el) => find(el).innerText.trim());
 
     assert.deepEqual(
       titles,
@@ -1016,7 +972,7 @@ module('Acceptance | Navi Report', function(hooks) {
     );
   });
 
-  test('reports route actions -- clone', async function(assert) {
+  test('reports route actions -- clone', async function (assert) {
     assert.expect(2);
 
     await visit('/reports');
@@ -1033,43 +989,28 @@ module('Acceptance | Navi Report', function(hooks) {
     assert.dom('.navi-report__title').hasText('Copy of Hyrule News', 'Cloned report is being viewed');
   });
 
-  test('reports route actions -- share', async function(assert) {
-    assert.expect(1);
-
-    await visit('/reports');
-
-    await triggerEvent('.navi-collection__row0', 'mouseenter');
-    // Click "Share"
-    await click('.navi-collection__row0 .share .btn');
-
-    assert.dom('.primary-header').hasText('Share "Hyrule News"', 'Share modal pops up when action is clicked');
-
-    // Click "Cancel"
-    await click('.navi-modal .btn-secondary');
-  });
-
-  test('reports route actions -- delete', async function(assert) {
+  test('reports route actions -- delete', async function (assert) {
     assert.expect(3);
 
     await visit('/reports');
 
     await triggerEvent('.navi-collection__row0', 'mouseenter');
-    // Click "Delete"
-    await click('.navi-collection__row0 .delete button');
+    await click('.navi-collection__row0 .delete__action-btn');
 
-    assert.dom('.primary-header').hasText('Delete "Hyrule News"', 'Delete modal pops up when action is clicked');
+    assert
+      .dom('.delete__modal-details')
+      .hasText('This action cannot be undone. This will permanently delete the Hyrule News report.');
 
-    //Click "Confirm"
-    await click('.navi-modal .btn-primary');
+    await click('.delete__delete-btn');
 
     assert.ok(currentURL().endsWith('/reports'), 'After deleting, user is brought to report list view');
 
-    let reportNames = findAll('.table tbody td:first-child').map(el => el.innerText.trim());
+    let reportNames = findAll('.table tbody td:first-child').map((el) => el.innerText.trim());
 
     assert.deepEqual(reportNames, ['Hyrule Ad&Nav Clicks', 'Report 12'], 'Deleted report is removed from list');
   });
 
-  test('Visiting Reports Route From Breadcrumb', async function(assert) {
+  test('Visiting Reports Route From Breadcrumb', async function (assert) {
     assert.expect(1);
 
     await visit('/reports/1/view');
@@ -1083,7 +1024,7 @@ module('Acceptance | Navi Report', function(hooks) {
     );
   });
 
-  test('Revert report changes when exiting from route', async function(assert) {
+  test('Revert report changes when exiting from route', async function (assert) {
     assert.expect(2);
 
     await visit('/reports/13/view');
@@ -1108,7 +1049,7 @@ module('Acceptance | Navi Report', function(hooks) {
     );
   });
 
-  test('Revert Visualization Type - Back to Original Type', async function(assert) {
+  test('Revert Visualization Type - Back to Original Type', async function (assert) {
     assert.expect(3);
 
     /* == Load report == */
@@ -1127,7 +1068,7 @@ module('Acceptance | Navi Report', function(hooks) {
     assert.ok(!!findAll('.line-chart-widget').length, 'line-chart visualization is shown when reverted');
   });
 
-  test('Revert Visualization Type - Updated Report', async function(assert) {
+  test('Revert Visualization Type - Updated Report', async function (assert) {
     assert.expect(5);
 
     /* == Load report == */
@@ -1156,7 +1097,7 @@ module('Acceptance | Navi Report', function(hooks) {
     assert.ok(!!findAll('.table-widget').length, 'table visualization is shown when reverted');
   });
 
-  test('Revert Visualization Type - New Report', async function(assert) {
+  test('Revert Visualization Type - New Report', async function (assert) {
     assert.expect(4);
 
     /* == Create report == */
@@ -1166,7 +1107,7 @@ module('Acceptance | Navi Report', function(hooks) {
     await clickItem('dimension', 'Date Time');
     await selectChoose('.navi-column-config-item__parameter-trigger', 'Day');
     await clickItemFilter('dimension', 'Date Time');
-    await selectChoose('.filter-builder__select-trigger', 'In The Past');
+    await selectChoose('.filter-builder__operator-trigger', 'In The Past');
 
     await click('.navi-report__run-btn');
 
@@ -1188,7 +1129,7 @@ module('Acceptance | Navi Report', function(hooks) {
     assert.ok(!!findAll('.table-widget').length, 'table visualization is shown when reverted');
   });
 
-  test('Toggle Edit Visualization', async function(assert) {
+  test('Toggle Edit Visualization', async function (assert) {
     assert.expect(3);
 
     /* == Visit report == */
@@ -1207,7 +1148,7 @@ module('Acceptance | Navi Report', function(hooks) {
     assert.dom('.report-view__visualization-edit').exists('visualization config is opened after clicking edit button');
 
     /* == Close config == */
-    await click('.report-view__visualization-edit-btn');
+    await click('.report-view__visualization-edit-close');
     await animationsSettled();
 
     assert
@@ -1215,7 +1156,7 @@ module('Acceptance | Navi Report', function(hooks) {
       .doesNotExist('visualization config is closed after clicking edit button');
   });
 
-  test('Disabled Visualization Edit', async function(assert) {
+  test('Disabled Visualization Edit', async function (assert) {
     assert.expect(4);
 
     // Visit report and make a change that invalidates visualization
@@ -1240,7 +1181,7 @@ module('Acceptance | Navi Report', function(hooks) {
     assert.dom('.report-view__info-text').isNotVisible('After running, notification to run is no longer visible');
   });
 
-  test('Disabled Visualization Edit While Editing', async function(assert) {
+  test('Disabled Visualization Edit While Editing', async function (assert) {
     assert.expect(9);
 
     await visit('/reports/2/view');
@@ -1259,7 +1200,7 @@ module('Acceptance | Navi Report', function(hooks) {
       .isVisible('Visualization edit panel is still visible after making changes that do not change the request');
 
     assert
-      .dom('.report-view__visualization-edit-btn')
+      .dom('.report-view__visualization-edit-close')
       .isVisible('Visualization edit button is is still visible after making changes that do not change the request');
 
     assert
@@ -1295,7 +1236,7 @@ module('Acceptance | Navi Report', function(hooks) {
       .isNotVisible('Notification to run is visible when there are request changes that have not been run');
   });
 
-  test('Save changes', async function(assert) {
+  test('Save changes', async function (assert) {
     assert.expect(2);
 
     await visit('/reports/13/view');
@@ -1311,22 +1252,20 @@ module('Acceptance | Navi Report', function(hooks) {
     assert.dom('.navi-report__save-btn').isNotVisible('Save changes button is visible when not owner of a report');
   });
 
-  test('Error route', async function(assert) {
+  test('Error route', async function (assert) {
     assert.expect(1);
 
     //suppress errors and exceptions for this test
     let originalLoggerError = Ember.Logger.error,
       originalException = Ember.Test.adapter.exception;
 
-    Ember.Logger.error = function() {};
-    Ember.Test.adapter.exception = function() {};
+    Ember.Logger.error = function () {};
+    Ember.Test.adapter.exception = function () {};
 
     await visit('/reports/invalidRoute');
 
     assert.equal(
-      find('.report-not-found')
-        .innerText.replace(/\s+/g, ' ')
-        .trim(),
+      find('.report-not-found').innerText.replace(/\s+/g, ' ').trim(),
       'Oops! Something went wrong with this report. Try going back to where you were last or to the reports page.',
       'An error message is displayed for an invalid route'
     );
@@ -1335,14 +1274,14 @@ module('Acceptance | Navi Report', function(hooks) {
     Ember.Test.adapter.exception = originalException;
   });
 
-  test('Updating chart series', async function(assert) {
+  test('Updating chart series', async function (assert) {
     assert.expect(4);
 
     // Check inital series
     await visit('/reports/1/view');
 
-    let seriesLabels = findAll('.c3-legend-item').map(el => el.textContent.trim());
-    let hiddenLabels = findAll('.c3-legend-item-hidden').map(el => el.textContent.trim());
+    let seriesLabels = findAll('.c3-legend-item').map((el) => el.textContent.trim());
+    let hiddenLabels = findAll('.c3-legend-item-hidden').map((el) => el.textContent.trim());
     assert.deepEqual(
       seriesLabels,
       ['Property 1', 'Property 2', 'Property 3', 'Property 4'],
@@ -1352,23 +1291,23 @@ module('Acceptance | Navi Report', function(hooks) {
 
     // Toggle off first series
     await click('.c3-legend-item');
-    hiddenLabels = findAll('.c3-legend-item-hidden').map(el => el.textContent.trim());
+    hiddenLabels = findAll('.c3-legend-item-hidden').map((el) => el.textContent.trim());
     assert.deepEqual(hiddenLabels, ['Property 1'], 'Selected series has been hidden from chart');
 
     // Toggle on first series
     await click('.c3-legend-item');
-    hiddenLabels = findAll('.c3-legend-item-hidden').map(el => el.textContent.trim());
+    hiddenLabels = findAll('.c3-legend-item-hidden').map((el) => el.textContent.trim());
     assert.deepEqual(hiddenLabels, [], 'Property 1 is no longer hidden from chart');
   });
 
-  test('favorite reports', async function(assert) {
+  test('favorite reports', async function (assert) {
     assert.expect(3);
 
     // Filter by favorites
     await visit('/reports');
     await selectChoose('.navi-collection__filter-trigger', 'Favorites');
 
-    let listedReports = findAll('tbody tr td:first-of-type').map(el => el.innerText.trim());
+    let listedReports = findAll('tbody tr td:first-of-type').map((el) => el.innerText.trim());
 
     assert.deepEqual(listedReports, ['Hyrule Ad&Nav Clicks'], 'Report 2 is in favorites section');
 
@@ -1380,7 +1319,7 @@ module('Acceptance | Navi Report', function(hooks) {
     await visit('/reports');
     await selectChoose('.navi-collection__filter-trigger', 'Favorites');
 
-    listedReports = findAll('tbody tr td:first-of-type').map(el => el.innerText.trim());
+    listedReports = findAll('tbody tr td:first-of-type').map((el) => el.innerText.trim());
 
     assert.deepEqual(listedReports, ['Hyrule Ad&Nav Clicks', 'Hyrule News'], 'Two reports are in favorites now');
 
@@ -1390,12 +1329,12 @@ module('Acceptance | Navi Report', function(hooks) {
     await visit('/reports');
     await selectChoose('.navi-collection__filter-trigger', 'Favorites');
 
-    listedReports = findAll('tbody tr td:first-of-type').map(el => el.innerText.trim());
+    listedReports = findAll('tbody tr td:first-of-type').map((el) => el.innerText.trim());
 
     assert.deepEqual(listedReports, ['Hyrule News'], 'Only one report is in favorites now');
   });
 
-  test('favorite report - rollback on failure', async function(assert) {
+  test('favorite report - rollback on failure', async function (assert) {
     assert.expect(2);
 
     // Mock server path endpoint to mock failure
@@ -1406,7 +1345,7 @@ module('Acceptance | Navi Report', function(hooks) {
     await visit('/reports');
     await selectChoose('.navi-collection__filter-trigger', 'Favorites');
 
-    let listedReports = findAll('tbody tr td:first-of-type').map(el => el.innerText.trim());
+    let listedReports = findAll('tbody tr td:first-of-type').map((el) => el.innerText.trim());
 
     assert.deepEqual(listedReports, ['Hyrule Ad&Nav Clicks'], 'Report 2 is in favorites section');
 
@@ -1418,12 +1357,12 @@ module('Acceptance | Navi Report', function(hooks) {
 
     await selectChoose('.navi-collection__filter-trigger', 'Favorites');
 
-    listedReports = findAll('tbody tr td:first-of-type').map(el => el.innerText.trim());
+    listedReports = findAll('tbody tr td:first-of-type').map((el) => el.innerText.trim());
 
     assert.deepEqual(listedReports, ['Hyrule Ad&Nav Clicks'], 'The user state is rolled back on failure');
   });
 
-  test('running report after reverting changes', async function(assert) {
+  test('running report after reverting changes', async function (assert) {
     assert.expect(2);
 
     /* == Modify report by adding a metric == */
@@ -1447,12 +1386,12 @@ module('Acceptance | Navi Report', function(hooks) {
     );
   });
 
-  skip('Running a report against unauthorized table shows unauthorized route', async function(assert) {
+  skip('Running a report against unauthorized table shows unauthorized route', async function (assert) {
     //build-data issues
     assert.expect(5);
     await visit('/reports/new');
 
-    await selectChoose('.navi-table-select__dropdown', 'Protected Table');
+    await selectChoose('.navi-table-select__trigger', 'Protected Table');
 
     await click('.navi-report__run-btn');
 
@@ -1461,7 +1400,7 @@ module('Acceptance | Navi Report', function(hooks) {
     assert.ok(!!findAll('.navi-report-invalid__info-message .fa-lock').length, 'unauthorized component is loaded');
 
     await click('.navi-report__cancel-btn');
-    await selectChoose('.navi-table-select__dropdown', 'Network');
+    await selectChoose('.navi-table-select__trigger', 'Network');
     await click('.navi-report__run-btn');
     await click('.visualization-toggle__option[title="Data Table"]');
 
@@ -1475,7 +1414,7 @@ module('Acceptance | Navi Report', function(hooks) {
     assert.ok(!!findAll('.table-widget').length, 'Data table visualization loads');
   });
 
-  test("filtering on a dimension with a storage strategy of 'none'", async function(assert) {
+  test("filtering on a dimension with a storage strategy of 'none'", async function (assert) {
     assert.expect(4);
     //Add filter for a dimension where storageStrategy is 'none' and try to run the report
     await visit('/reports/13/view');
@@ -1515,7 +1454,7 @@ module('Acceptance | Navi Report', function(hooks) {
       .isVisible("Dimension select is used when the dimension's storage strategy is not 'none'");
   });
 
-  test('filter - add and remove using filter icon', async function(assert) {
+  test('filter - add and remove using filter icon', async function (assert) {
     assert.expect(4);
 
     await visit('/reports/1');
@@ -1549,7 +1488,7 @@ module('Acceptance | Navi Report', function(hooks) {
     );
   });
 
-  skip('filters - collapse and expand', async function(assert) {
+  skip('filters - collapse and expand', async function (assert) {
     // TODO: Fix after https://github.com/yahoo/yavin/pull/1171 is merged
     assert.expect(9);
     //adding dimensions and metrics not currently expanding filter collection
@@ -1603,7 +1542,7 @@ module('Acceptance | Navi Report', function(hooks) {
       .hasClass('filter-collection--collapsed', 'Filters are still collapsed when removing a metric filter');
   });
 
-  test('Dimension selector', async function(assert) {
+  test('Dimension selector', async function (assert) {
     assert.expect(7);
 
     await visit('/reports/1');
@@ -1654,7 +1593,7 @@ module('Acceptance | Navi Report', function(hooks) {
     assert.ok(dimensionItem.item.querySelector('.fa-plus-circle'), 'Dimension row still has a plus icon');
   });
 
-  test('Metric selector', async function(assert) {
+  test('Metric selector', async function (assert) {
     assert.expect(6);
 
     await visit('/reports/1');
@@ -1696,12 +1635,12 @@ module('Acceptance | Navi Report', function(hooks) {
     assert.ok(metricItem.item.querySelector('.fa-plus-circle'), 'Metric row still has a plus icon');
   });
 
-  test('Test filter "Is Empty" is accepted', async function(assert) {
+  test('Test filter "Is Empty" is accepted', async function (assert) {
     assert.expect(2);
     await visit('/reports/1');
 
     await clickItemFilter('dimension', 'Operating System');
-    await selectChoose('.filter-collection__row:last-of-type .filter-builder-dimension__operator', 'Is Empty');
+    await selectChoose('.filter-collection__row:last-of-type .filter-builder__operator-trigger', 'Is Empty');
     await click('.navi-report__run-btn');
 
     assert.ok(
@@ -1712,12 +1651,12 @@ module('Acceptance | Navi Report', function(hooks) {
     assert.dom('.navi-info-message__error-list-item').isNotVisible('Should not show empty values error');
   });
 
-  test('Test filter "Is Not Empty" is accepted', async function(assert) {
+  test('Test filter "Is Not Empty" is accepted', async function (assert) {
     assert.expect(2);
     await visit('/reports/1');
 
     await clickItemFilter('dimension', 'Operating System');
-    await selectChoose('.filter-collection__row:last-of-type .filter-builder-dimension__operator', 'Is Not Empty');
+    await selectChoose('.filter-collection__row:last-of-type .filter-builder__operator-trigger', 'Is Not Empty');
     await click('.navi-report__run-btn');
 
     assert.ok(
@@ -1728,7 +1667,7 @@ module('Acceptance | Navi Report', function(hooks) {
     assert.dom('.navi-info-message__error-list-item').isNotVisible('Should not show empty values error');
   });
 
-  test("Date Picker doesn't change date when moving to time grain where dates are valid", async function(assert) {
+  test("Date Picker doesn't change date when moving to time grain where dates are valid", async function (assert) {
     assert.expect(6);
 
     await visit('/reports/1');
@@ -1742,57 +1681,67 @@ module('Acceptance | Navi Report', function(hooks) {
     await click($('.ember-power-calendar-selector-month:contains(Jan)')[0]);
     await click('.navi-report__run-btn');
 
-    assert.dom('.filter-values--date-range-input__low-value').hasText('Jan 2015', 'Start Month is changed to Jan 2015');
-    assert.dom('.filter-values--date-range-input__high-value').hasText('Jan 2015', 'End Month is changed to Jan 2015');
+    assert
+      .dom('.filter-values--date-range-input__low-value input')
+      .hasValue('Jan 2015', 'Start Month is changed to Jan 2015');
+    assert
+      .dom('.filter-values--date-range-input__high-value input')
+      .hasValue('Jan 2015', 'End Month is changed to Jan 2015');
 
     await selectChoose('.navi-column-config-item__parameter', 'Day');
     await click('.navi-report__run-btn');
 
     assert
-      .dom('.filter-values--date-range-input__low-value')
-      .hasText('Jan 01, 2015', 'Switching to day time period preserves date to start of month');
+      .dom('.filter-values--date-range-input__low-value input')
+      .hasValue('Jan 01, 2015', 'Switching to day time period preserves date to start of month');
     assert
-      .dom('.filter-values--date-range-input__high-value')
-      .hasText('Jan 31, 2015', 'Switching to day time period preserves date to end of month');
+      .dom('.filter-values--date-range-input__high-value input')
+      .hasValue('Jan 31, 2015', 'Switching to day time period preserves date to end of month');
 
     await selectChoose('.navi-column-config-item__parameter', 'Week');
     await click('.navi-report__run-btn');
 
     assert
-      .dom('.filter-values--date-range-input__low-value')
-      .hasText('Dec 29, 2014', 'Switching to week casts the date to match the start of the date time period');
+      .dom('.filter-values--date-range-input__low-value input')
+      .hasValue('Dec 29, 2014', 'Switching to week casts the date to match the start of the date time period');
     assert
-      .dom('.filter-values--date-range-input__high-value')
-      .hasText('Jan 25, 2015', 'Switching to week casts the date to match the end of the date time period');
+      .dom('.filter-values--date-range-input__high-value input')
+      .hasValue('Jan 25, 2015', 'Switching to week casts the date to match the end of the date time period');
   });
 
-  test('Date picker change interval type', async function(assert) {
+  test('Date picker change interval type', async function (assert) {
     assert.expect(6);
 
     await visit('/reports/1');
 
-    assert.dom('.filter-values--date-range-input__low-value').hasText('Nov 09, 2015', 'The start date is Nov 09, 2015');
-    assert.dom('.filter-values--date-range-input__high-value').hasText('Nov 15, 2015', 'The end date is Nov 15, 2015');
-
-    await selectChoose('.filter-builder__select-trigger', 'Between');
     assert
-      .dom('.filter-values--date-range-input__low-value')
-      .hasText('Nov 09, 2015', 'The start date is still Nov 09, 2015');
+      .dom('.filter-values--date-range-input__low-value input')
+      .hasValue('Nov 09, 2015', 'The start date is Nov 09, 2015');
     assert
-      .dom('.filter-values--date-range-input__high-value')
-      .hasText('Nov 15, 2015', 'The end date is still Nov 15, 2015');
+      .dom('.filter-values--date-range-input__high-value input')
+      .hasValue('Nov 15, 2015', 'The end date is Nov 15, 2015');
 
-    await selectChoose('.filter-builder__select-trigger', 'Since');
-    assert.dom('.filter-values--date-input__trigger').hasText('Nov 09, 2015', 'The start date is still Nov 09, 2015');
+    await selectChoose('.filter-builder__operator-trigger', 'Between');
+    assert
+      .dom('.filter-values--date-range-input__low-value input')
+      .hasValue('Nov 09, 2015', 'The start date is still Nov 09, 2015');
+    assert
+      .dom('.filter-values--date-range-input__high-value input')
+      .hasValue('Nov 15, 2015', 'The end date is still Nov 15, 2015');
 
-    await selectChoose('.filter-builder__select-trigger', 'Current Day');
+    await selectChoose('.filter-builder__operator-trigger', 'Since');
+    assert
+      .dom('.filter-values--date-input__trigger input')
+      .hasValue('Nov 09, 2015', 'The start date is still Nov 09, 2015');
 
-    const today = moment().format('MMM DD, YYYY');
-    assert.dom('.filter-values--current-period').hasText(`The current day. (${today})`, 'The current day');
+    await selectChoose('.filter-builder__operator-trigger', 'Current Day');
+
+    const today = moment.utc().format('MMM DD, YYYY');
+    assert.dom('.filter-builder__values').hasText(`The current day. (${today})`, 'The current day');
   });
 
-  test('Date picker all timegrain', async function(assert) {
-    assert.expect(5);
+  test('Fili Datasource: Remove time column (all grain)', async function (assert) {
+    assert.expect(7);
 
     await visit('/reports/1');
 
@@ -1806,43 +1755,56 @@ module('Acceptance | Navi Report', function(hooks) {
     await clickTrigger('.filter-values--date-range-input__high-value');
     await click($('.ember-power-calendar-selector-month:contains(May)')[0]);
 
-    assert.dom('.filter-values--date-range-input__low-value').hasText('Jan 2015', 'The start date is month Jan 2015');
-    assert.dom('.filter-values--date-range-input__high-value').hasText('May 2015', 'The end date is month May 2015');
+    assert
+      .dom('.filter-values--date-range-input__low-value input')
+      .hasValue('Jan 2015', 'The start date is month Jan 2015');
+    assert
+      .dom('.filter-values--date-range-input__high-value input')
+      .hasValue('May 2015', 'The end date is month May 2015');
 
-    // select 'all' grain
-    await selectChoose('.navi-column-config-item__parameter', 'All');
+    // Remove date time group by
+    await click('.navi-column-config-item__remove-icon[aria-label="delete time-dimension Date Time (month)"]');
+    assert.dom('.filter-builder__subject').hasText('Date Time (hour)', 'The filter grain is set to the lowest grain');
+    // TODO: Better support for hour grain
 
     assert
-      .dom('.filter-values--date-range-input__low-value')
-      .hasText('Jan 01, 2015', 'The start date is beginning of Jan, 2015');
+      .dom('.filter-values--date-range-input__low-value input')
+      .hasValue('Jan 01, 2015', 'The start date is beginning of Jan, 2015');
     assert
-      .dom('.filter-values--date-range-input__high-value')
-      .hasText('May 31, 2015', 'The end date is end of May, 2015');
+      .dom('.filter-values--date-range-input__high-value input')
+      .hasValue('May 31, 2015', 'The end date is end of May, 2015');
 
     await clickTrigger('.filter-values--date-range-input__high-value');
     await click('.ember-power-calendar-day[data-date="2015-05-30"]');
     assert
-      .dom('.filter-values--date-range-input__high-value')
-      .hasText('May 30, 2015', 'Calendar defaults "all" grain  to show the lowest grain which is day');
+      .dom('.filter-values--date-range-input__high-value input')
+      .hasValue('May 30, 2015', 'Calendar defaults "all" grain  to show the lowest grain which is day');
+
+    await click('.navi-report__run-btn');
+    assert.deepEqual(
+      findAll('li.table-header-cell').map((el) => el.textContent.trim()),
+      ['Property (id)', 'Ad Clicks', 'Nav Link Clicks'],
+      'The table is successfully queried with no Date Time group by because it supports the all grain'
+    );
   });
 
-  skip("Date picker advanced doesn't modify interval", async function(assert) {
+  skip("Date picker advanced doesn't modify interval", async function (assert) {
     //TODO advanced date picker has been disabled
     assert.expect(6);
     await visit('/reports/1/view');
 
-    await selectChoose('.filter-builder__select-trigger', 'Advanced');
+    await selectChoose('.filter-builder__operator-trigger', 'Advanced');
     const startInput = findAll('.filter-values--advanced-interval-input__value')[0];
     const endInput = findAll('.filter-values--advanced-interval-input__value')[1];
     assert.dom(startInput).hasValue('P7D', 'The start input is not modified');
     assert.dom(endInput).hasValue('2015-11-16', 'The end input is not modified');
 
-    await click('.get-api__btn');
+    await click('.get-api__action-btn');
     assert.ok(
-      find('.navi-modal__input').value.includes('dateTime=P7D%2F2015-11-16'),
+      find('.get-api__api-input').value.includes('dateTime=P7D%2F2015-11-16'),
       'The while in advanced mode shows exactly what is in the start/end inputs'
     );
-    await click('.navi-modal__close');
+    await click('.d-close');
 
     await fillIn(startInput, 'P1M');
     await blur(startInput);
@@ -1851,15 +1813,15 @@ module('Acceptance | Navi Report', function(hooks) {
     assert.dom(startInput).hasValue('P1M', 'The start input was updated exactly');
     assert.dom(endInput).hasValue('2020-04-01', 'The end input was updated exactly');
 
-    await click('.get-api__btn');
+    await click('.get-api__action-btn');
     assert.ok(
-      find('.navi-modal__input').value.includes('dateTime=P1M%2F2020-04-01'),
+      find('.get-api__api-input').value.includes('dateTime=P1M%2F2020-04-01'),
       'The query is updated to show the new start/end inputs exactly'
     );
-    await click('.navi-modal__close');
+    await click('.d-close');
   });
 
-  test("Report with an unknown table doesn't crash", async function(assert) {
+  test("Report with an unknown table doesn't crash", async function (assert) {
     assert.expect(1);
     await visit('/reports/9');
 
@@ -1871,25 +1833,25 @@ module('Acceptance | Navi Report', function(hooks) {
       );
   });
 
-  test('Filter with large cardinality dimensions value selection works', async function(assert) {
+  test('Filter with large cardinality dimensions value selection works', async function (assert) {
     assert.expect(2);
-    let option,
-      dropdownSelector = '.filter-values--dimension-select__trigger';
+    let option;
+    const dropdownSelector = '.filter-values--dimension-select__trigger';
     await visit('/reports/new');
 
     // Load table A as it has the large cardinality dimensions, and choose a large cardinality dimension
 
-    await selectChoose('.navi-table-select__dropdown', 'Table A');
+    await selectChoose('.navi-table-select__trigger', 'Table A');
     await clickItem('dimension', 'EventId');
     await clickItem('metric', 'Network Sessions');
     await clickItem('dimension', 'Date Time');
     await clickItemFilter('dimension', 'Date Time');
-    await selectChoose('.filter-builder__select-trigger', 'Between');
+    await selectChoose('.filter-builder__operator-trigger', 'Between');
 
-    await clickTrigger('.filter-values--date-range-input__low-value .ember-basic-dropdown-trigger');
+    await clickTrigger('.filter-values--date-range-input__low-value');
     await click($('button.ember-power-calendar-day--current-month:contains(4)')[0]);
 
-    await clickTrigger('.filter-values--date-range-input__high-value .ember-basic-dropdown-trigger');
+    await clickTrigger('.filter-values--date-range-input__high-value');
     await click($('button.ember-power-calendar-day--current-month:contains(5)')[0]);
     await click($('.navi-report__footer button:Contains(Run)')[0]);
 
@@ -1906,7 +1868,7 @@ module('Acceptance | Navi Report', function(hooks) {
 
     // Simulate typing a search which pulls large cardinality dimension values from the server
     await selectSearch(dropdownSelector, option.toLowerCase().substring(0, 3));
-    await click($('.filter-values--dimension-select__dropdown .ember-power-select-option:contains(' + option + ')')[0]);
+    await click($(`.filter-values--dimension-select__dropdown .ember-power-select-option:contains('${option}')`)[0]);
 
     // Check if the selected item is still selected after the search
     assert.ok(
@@ -1917,7 +1879,7 @@ module('Acceptance | Navi Report', function(hooks) {
     );
   });
 
-  test('dimension select filter works with dimension ids containing commas', async function(assert) {
+  test('dimension select filter works with dimension ids containing commas', async function (assert) {
     await visit('/reports/new');
     await clickItemFilter('dimension', 'Dimension with comma');
 
@@ -1927,16 +1889,16 @@ module('Acceptance | Navi Report', function(hooks) {
     await clickItemFilter('dimension', 'Date Time');
     await clickItem('dimension', 'Date Time');
 
-    await selectChoose('.filter-builder__select-trigger', 'Between');
+    await selectChoose(findAll('.filter-builder__operator-trigger')[1], 'Between');
 
-    await clickTrigger('.filter-values--date-range-input__low-value .ember-basic-dropdown-trigger');
+    await clickTrigger('.filter-values--date-range-input__low-value');
 
     await click($('button.ember-power-calendar-day--current-month:contains(4)')[0]);
     await clickTrigger('.filter-values--date-range-input__high-value .ember-basic-dropdown-trigger');
     await click($('button.ember-power-calendar-day--current-month:contains(5)')[0]);
 
     assert.deepEqual(
-      findAll('.ember-power-select-multiple-option span:not(.ember-power-select-multiple-remove-btn)').map(el =>
+      findAll('.ember-power-select-multiple-option span:not(.ember-power-select-multiple-remove-btn)').map((el) =>
         el.textContent.trim()
       ),
       ['no comma', 'yes, comma'],
@@ -1944,9 +1906,9 @@ module('Acceptance | Navi Report', function(hooks) {
     );
 
     await click('.navi-report__run-btn');
-    await click('.get-api__btn');
+    await click('.get-api__action-btn');
 
-    const url = find('.navi-modal__input').value;
+    const url = find('.get-api__api-input').value;
     const expectedFilter = 'commaDim|id-in["no comma","yes, comma"]';
     assert.ok(
       decodeURIComponent(url).includes(expectedFilter),
@@ -1954,7 +1916,7 @@ module('Acceptance | Navi Report', function(hooks) {
     );
   });
 
-  test('reordering metrics does not rerun the request', async function(assert) {
+  test('reordering metrics does not rerun the request', async function (assert) {
     assert.expect(1);
     await visit('/reports/2');
 
@@ -1973,18 +1935,18 @@ module('Acceptance | Navi Report', function(hooks) {
     );
 
     assert.deepEqual(
-      findAll('.table-header-row-vc--view .table-header-cell__title').map(el => el.innerText.trim()),
+      findAll('.table-header-row-vc--view .table-header-cell__title').map((el) => el.innerText.trim()),
       ['Nav Link Clicks', 'Property (id)', 'Ad Clicks', 'Date Time (day)'],
       'The headers are reordered as specified by the reorder'
     );
   });
 
-  test('adding metrics to reordered table keeps order', async function(assert) {
+  test('adding metrics to reordered table keeps order', async function (assert) {
     assert.expect(3);
     await visit('/reports/2');
 
     assert.deepEqual(
-      findAll('.table-header-row-vc--view .table-header-cell__title').map(el => el.innerText.trim()),
+      findAll('.table-header-row-vc--view .table-header-cell__title').map((el) => el.innerText.trim()),
       ['Date Time (day)', 'Property (id)', 'Ad Clicks', 'Nav Link Clicks'],
       'The headers are ordered correctly'
     );
@@ -1999,7 +1961,7 @@ module('Acceptance | Navi Report', function(hooks) {
     );
 
     assert.deepEqual(
-      findAll('.table-header-row-vc--view .table-header-cell__title').map(el => el.innerText.trim()),
+      findAll('.table-header-row-vc--view .table-header-cell__title').map((el) => el.innerText.trim()),
       ['Nav Link Clicks', 'Property (id)', 'Ad Clicks', 'Date Time (day)'],
       'The headers are reordered as specified by the reorder'
     );
@@ -2008,13 +1970,13 @@ module('Acceptance | Navi Report', function(hooks) {
     await click('.navi-report__run-btn');
 
     assert.deepEqual(
-      findAll('.table-header-row-vc--view .table-header-cell__title').map(el => el.textContent.trim()),
+      findAll('.table-header-row-vc--view .table-header-cell__title').map((el) => el.textContent.trim()),
       ['Nav Link Clicks', 'Property (id)', 'Ad Clicks', 'Date Time (day)', 'Total Clicks'],
       'The headers are reordered as specified by the reorder'
     );
   });
 
-  test('Parameterized metrics with default displayname are not considered custom', async function(assert) {
+  test('Parameterized metrics with default displayname are not considered custom', async function (assert) {
     assert.expect(2);
     await visit('/reports/8');
 
@@ -2029,7 +1991,7 @@ module('Acceptance | Navi Report', function(hooks) {
       );
   });
 
-  test('Cancel Report', async function(assert) {
+  test('Cancel Report', async function (assert) {
     assert.expect(14);
 
     server.urlPrefix = `${config.navi.dataSources[0].uri}/v1`;
@@ -2042,7 +2004,7 @@ module('Acceptance | Navi Report', function(hooks) {
     );
 
     // Load the report without waiting for it to finish loading
-    visit('/reports/13').catch(error => {
+    visit('/reports/13').catch((error) => {
       //https://github.com/emberjs/ember-test-helpers/issues/332
       const { message } = error;
       if (message !== 'TransitionAborted') {
@@ -2052,11 +2014,10 @@ module('Acceptance | Navi Report', function(hooks) {
 
     await waitFor('.navi-report__cancel-btn', { timeout: 5000 });
 
-    let buttons = findAll('.navi-report__footer .navi-button');
-    assert.dom('.navi-loader__spinner').isVisible('Report is loading');
-
+    let buttons = findAll('.navi-report__footer .button');
+    assert.dom('.loader').isVisible('Report is loading');
     assert.deepEqual(
-      buttons.map(e => e.textContent.trim()),
+      buttons.map((e) => e.textContent.trim()),
       ['Cancel'],
       'When report is loading, the only footer button is `Cancel`'
     );
@@ -2068,8 +2029,8 @@ module('Acceptance | Navi Report', function(hooks) {
       .dom('.report-builder__metric-selector.report-builder__container--disabled')
       .isVisible('Metric selector is disabled during run');
     assert
-      .dom('.report-builder__container--table.report-builder__container--disabled')
-      .isVisible('Table selector is disabled during run');
+      .dom('.navi-table-select__trigger')
+      .hasAttribute('aria-disabled', 'true', 'Table selector is disabled during run');
     assert
       .dom('.report-builder__container--filters.report-builder__container--disabled')
       .isVisible('Filter collection is disabled during run');
@@ -2080,7 +2041,7 @@ module('Acceptance | Navi Report', function(hooks) {
     assert.equal(currentURL(), '/reports/13/edit', 'Clicking `Cancel` brings the user to the edit route');
 
     assert.deepEqual(
-      findAll('.navi-report__footer .navi-button').map(e => e.textContent.trim()),
+      findAll('.navi-report__footer .button').map((e) => e.textContent.trim()),
       ['Run'],
       'When not loading a report, the standard footer buttons are available'
     );
@@ -2090,7 +2051,7 @@ module('Acceptance | Navi Report', function(hooks) {
     assert.equal(currentURL(), '/reports/13/view', 'Running the report brings the user to the view route');
 
     assert.deepEqual(
-      findAll('.navi-report__footer .navi-button').map(e => e.textContent.trim()),
+      findAll('.navi-report__footer .button').map((e) => e.textContent.trim()),
       ['Run'],
       'When not loading a report, the standard footer buttons are available'
     );
@@ -2102,17 +2063,17 @@ module('Acceptance | Navi Report', function(hooks) {
       .dom('.report-builder__metric-selector')
       .doesNotHaveClass('report-builder__container--disabled', 'Metric selector is enabled after run');
     assert
-      .dom('.report-builder__container--table')
-      .doesNotHaveClass('report-builder__container--disabled', 'Table selector is enabled after run');
+      .dom('.navi-table-select__trigger')
+      .doesNotHaveAttribute('aria-disabled', 'true', 'Table selector is enabled after run');
     assert
       .dom('.report-builder__container--filters')
       .doesNotHaveClass('report-builder__container--disabled', 'Filter collection is enabled after run');
   });
 
-  test('Recreating same report after revert runs', async function(assert) {
+  test('Recreating same report after revert runs', async function (assert) {
     await visit('/reports/2/view');
 
-    const columns = () => findAll('.table-widget__table-headers .table-header-cell').map(el => el.textContent.trim());
+    const columns = () => findAll('.table-widget__table-headers .table-header-cell').map((el) => el.textContent.trim());
     assert.deepEqual(
       columns(),
       ['Date Time (day)', 'Property (id)', 'Ad Clicks', 'Nav Link Clicks'],
@@ -2144,7 +2105,7 @@ module('Acceptance | Navi Report', function(hooks) {
     );
   });
 
-  test('Table number formatting works', async function(assert) {
+  test('Table number formatting works', async function (assert) {
     assert.expect(4);
     await visit('/reports/2/view');
 
